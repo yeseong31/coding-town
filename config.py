@@ -20,11 +20,9 @@ def conn_mariadb():
             password=os.getenv('DB_PASSWORD'),
             host=os.getenv('DB_HOST'),
             port=int(os.getenv('DB_PORT')),
-            database=os.getenv('DB_NAME'),
-            charset='utf8'
+            database=os.getenv('DB_NAME')
         )
+        return conn
     except mariadb.Error as e:
         print(f"Error connecting to MariaDB Platform: {e}")
         sys.exit(1)
-
-    return conn.cursor()
