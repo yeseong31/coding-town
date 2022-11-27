@@ -1,8 +1,13 @@
 from flask import Blueprint, make_response, jsonify
+from flask_restx import Namespace
 
 from config import conn_mariadb
 
-bp = Blueprint('home', __name__, url_prefix='/')
+bp = Blueprint('meet', __name__, url_prefix='/meet')
+Meet = Namespace(
+    name="Meet",
+    description="Coding Town 채널 API",
+)
 
 
 @bp.route('/')
@@ -13,8 +18,7 @@ def home():
     sql = 'SELECT * FROM TEST;'
     cursor.execute(sql)
     result = cursor.fetchone()
-    # print(result)
     cursor.close()
 
-    data = {'test': 200}
+    data = {'result': result}
     return make_response(jsonify(data), 200)
