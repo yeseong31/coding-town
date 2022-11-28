@@ -12,14 +12,9 @@ def create_app():
     CORS(app)
     app.secret_key = config.SECRET_KEY
 
-    # ----- Blueprint -----
-    from .views import todo_views, meet_views
-    app.register_blueprint(todo_views.bp)
-    app.register_blueprint(meet_views.bp)
-
     # ----- Api -----
-    from .views.meet_views import Meet
-    from .views.todo_views import Todos
+    from .views.meet_views import ns as meet
+    from .views.todo_views import ns as todo
     api = Api(
         app,
         version='0.1',
@@ -29,7 +24,7 @@ def create_app():
         contact_email='yeseong31@naver.com',
         license='MIT'
     )
-    api.add_namespace(Meet, '/meet')
-    api.add_namespace(Todos, '/todo')
+    api.add_namespace(meet, '/meet')
+    api.add_namespace(todo, '/todo')
 
     return app
