@@ -1,4 +1,4 @@
-from flask import Flask, request, session
+from flask import Flask, request, session, render_template
 from flask_cors import CORS
 from flask_restx import Api
 from flask_socketio import SocketIO, emit, join_room
@@ -8,10 +8,17 @@ rooms_sid = {}  # 방
 names_sid = {}  # 사용자 이름
 
 
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
 def create_app():
     app = Flask(__name__, static_url_path='/static')
     app.config.from_envvar('APP_CONFIG_FILE')
     CORS(app)
+    
+    # ----- Error Page -----
+    app.register_error_handler(404, page_not_found)
     
     # ----- Api -----
     from .views.join_views import ns as join
