@@ -20,6 +20,7 @@ def create_app():
     # ----- Api -----
     from .views.join_views import ns as join
     from .views.todo_views import ns as todo
+    from .views.auth_views import ns as auth
     api = Api(
         app,
         version='0.1',
@@ -31,6 +32,7 @@ def create_app():
     )
     api.add_namespace(join, '/join')
     api.add_namespace(todo, '/todo')
+    api.add_namespace(auth, '/auth')
     
     # --- Web RTC ---
     socketio = SocketIO(app)
