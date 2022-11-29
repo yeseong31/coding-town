@@ -3,7 +3,7 @@ import sys
 
 import mariadb
 
-BASE_DIR = os.path.dirname(__file__)
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
 def conn_mariadb():
