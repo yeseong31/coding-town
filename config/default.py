@@ -10,11 +10,11 @@ def conn_mariadb():
     """Connecting to MariaDB Server"""
     try:
         conn = mariadb.connect(
-            user=os.getenv('DB_USER'),
-            password=os.getenv('DB_PASSWORD'),
-            host=os.getenv('DB_HOST'),
-            port=int(os.getenv('DB_PORT')),
-            database=os.getenv('DB_NAME')
+            user=os.getenv('MARIADB_USER'),
+            password=os.getenv('MARIADB_PASSWORD'),
+            host=os.getenv('MARIADB_HOST'),
+            port=int(os.getenv('MARIADB_PORT')),
+            database=os.getenv('MARIADB_NAME')
         )
         return conn
     except mariadb.Error as e:
