@@ -27,7 +27,7 @@ mariadb==1.1.5.post3
 MarkupSafe==2.1.1
 multidict==6.0.2
 packaging==21.3
-protobuf==3.20.1
+protobuf==3.20.2
 Pygments==2.13.0
 PyJWT==2.6.0
 PyMySQL==1.0.2
