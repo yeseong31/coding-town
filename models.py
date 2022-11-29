@@ -1,4 +1,4 @@
-from config import conn_mariadb
+from config.default import conn_mariadb
 
 
 class Todo():

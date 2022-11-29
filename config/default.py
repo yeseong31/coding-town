@@ -1,15 +1,9 @@
-import os.path
+import os
 import sys
 
 import mariadb
-from dotenv import load_dotenv
-
-# https://velog.io/@yvvyoon/python-env-dotenv
-load_dotenv(verbose=True)
 
 BASE_DIR = os.path.dirname(__file__)
-
-SECRET_KEY = os.getenv('SECRET_KEY')
 
 
 def conn_mariadb():

@@ -1,9 +1,7 @@
-from flask import Flask, request, session, render_template
+from flask import Flask, request, session
 from flask_cors import CORS
 from flask_restx import Api
 from flask_socketio import SocketIO, emit, join_room
-
-import config
 
 users_in_room = {}  # 사용자
 rooms_sid = {}  # 방
@@ -12,10 +10,8 @@ names_sid = {}  # 사용자 이름
 
 def create_app():
     app = Flask(__name__, static_url_path='/static')
-    app.config.from_object(config)
-    
+    app.config.from_envvar('APP_CONFIG_FILE')
     CORS(app)
-    app.secret_key = config.SECRET_KEY
     
     # ----- Api -----
     from .views.join_views import ns as join
