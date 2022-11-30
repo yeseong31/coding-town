@@ -1,4 +1,4 @@
-from flask import request, session, make_response, jsonify
+from flask import request, session, make_response, jsonify, current_app
 from flask_restx import Namespace, Resource
 
 ns = Namespace(
@@ -24,5 +24,6 @@ class Join(Resource):
         session[room_id] = {'name': display_name,
                             'mute_audio': mute_audio,
                             'mute_video': mute_video}
-        
+
+        current_app.logger.info("INFO 레벨로 출력")
         return make_response(jsonify(session[room_id]))
