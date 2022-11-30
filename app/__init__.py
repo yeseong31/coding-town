@@ -38,7 +38,7 @@ def create_app():
     api.add_namespace(test, '/test')
     
     # --- Web RTC ---
-    socketio = SocketIO(app)
+    socketio = SocketIO(app, cors_allowed_origins="*")
 
     # @app.route('/test', methods=('GET',))
     # def test():
@@ -60,12 +60,8 @@ def create_app():
 
     @socketio.on('connect')
     def on_connect():
-        sid = request.sid
-        print("New socket connected ", sid)
-
-    @socketio.on('connect')
-    def on_connect():
-        print(f'New socket connected: {request.sid}')
+        emit("response", {'data': 'Connected', 'username': session['username']})
+        # print(f'New socket connected: {request.sid}')
 
     @socketio.on('join-room')
     def on_join_room(data):
@@ -133,5 +129,13 @@ def create_app():
             print(f'{data["type"]} message from {sender_sid} to {target_sid}')
     
         socketio.emit('data', data, room=target_sid)
+
+    def message_received(methods=('GET', 'POST')):
+        print('message was received!!!')
+
+    @socketio.on('my event')
+    def handle_my_custom_event(json, methods=('GET', 'POST')):
+        print('received my event: ' + str(json))
+        socketio.emit('my response', json, callback=message_received)
     
     return app
