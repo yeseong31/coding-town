@@ -1,0 +1,53 @@
+<html lang="ko">
+<head>
+  <title>Flask-Simple-Chat</title>
+  <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+          integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
+          crossorigin="anonymous"></script>
+  <script type="text/javascript" charset="utf-8">
+      let socket;
+      $(document).ready(function () {
+          socket = io.connect('http://' + document.domain + ':' + location.port + '/chat');
+          socket.on('connect', function () {
+              socket.emit('joined', {});
+          });
+          socket.on('status', function (data) {
+              $('#chat').val($('#chat').val() + '<' + data.msg + '>\n');
+              $('#chat').scrollTop($('#chat')[0].scrollHeight);
+          });
+          socket.on('message', function (data) {
+              $('#chat').val($('#chat').val() + data.msg + '\n');
+              $('#chat').scrollTop($('#chat')[0].scrollHeight);
+          });
+          $('#text').keypress(function (e) {
+              const code = e.keyCode || e.which;
+              let text;
+              if (code === 13) {
+                  text = $('#text').val();
+                  $('#text').val('');
+                  socket.emit('text', {msg: text});
+              }
+          });
+      });
+
+      function leave_room() {
+          socket.emit('left', {}, function () {
+              socket.disconnect();
+
+              // go back to the login page
+              window.location.href = "{{ url_for('Chat_index') }}";
+          });
+      }
+  </script>
+</head>
+<body>
+
+<h1>Chat Room: {{ room }}</h1>
+<h3>edited by IML</h3>
+<label for="chat"></label><textarea id="chat" cols="80" rows="20"></textarea><br><br>
+<label for="text">{{ name }} </label><input id="text" size="80" placeholder="메시지를 입력해보세요!"><br><br>
+<a href="#" onclick="leave_room();">채팅방 나가기</a>
+
+</body>
+</html>

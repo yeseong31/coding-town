@@ -1,11 +1,10 @@
-from flask import Flask, render_template, make_response, jsonify
+from flask import Flask, render_template
 from flask_cors import CORS
 from flask_restx import Api
-from flask_socketio import SocketIO, join_room, send, leave_room, emit
+from flask_socketio import SocketIO
 
-users_in_room = {}  # 사용자
-rooms_sid = {}  # 방
-names_sid = {}  # 사용자 이름
+app = Flask(__name__, static_url_path='/static')
+sio = SocketIO(app, cors_allowed_origins="*", logger=True, engineio_logger=True)
 
 
 def page_not_found(e):
@@ -13,7 +12,6 @@ def page_not_found(e):
 
 
 def create_app():
-    app = Flask(__name__, static_url_path='/static')
     app.config.from_envvar('APP_CONFIG_FILE')
     CORS(app)
     
@@ -21,9 +19,7 @@ def create_app():
     app.register_error_handler(404, page_not_found)
     
     # ----- Api -----
-    from .views.join_views import ns as join
-    from .views.auth_views import ns as auth
-    from .views.test_views import ns as test
+    from .views import chat_views
     api = Api(
         app,
         version='0.1',
@@ -33,15 +29,16 @@ def create_app():
         contact_email='yeseong31@naver.com',
         license='MIT'
     )
-    api.add_namespace(join, '/join')
-    api.add_namespace(auth, '/auth')
-    api.add_namespace(test, '/test')
+    api.add_namespace(chat_views.ns, '/chat')
     
     # --- Web RTC ---
-    sio = SocketIO(app, cors_allowed_origins="*", logger=True, engineio_logger=True)
+    sio.init_app(app)
 
-    @sio.on('connect')
-    def message_received(methods=('GET', 'POST')):
-        return make_response(jsonify({'message': '메시지 받았음!'}), 200)
+    # ----- Namespace -----
+    from .events import ChatNamepsace
+    sio.on_namespace(ChatNamepsace('/chat'))
+    
+    # ----- Blueprint -----
+    app.register_blueprint(chat_views.bp)
     
     return app
