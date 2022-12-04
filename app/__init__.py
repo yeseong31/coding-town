@@ -31,12 +31,13 @@ def create_app():
     )
     api.add_namespace(chat_views.ns, '/chat')
     
-    # --- Web RTC ---
+    # --- WebRTC ---
     sio.init_app(app)
 
-    # ----- Namespace -----
-    from .events import ChatNamepsace
-    sio.on_namespace(ChatNamepsace('/chat'))
+    # ----- WebRTC Namespace -----
+    # 1204 removed
+    # from .events import ChatNamespace
+    # sio.on_namespace(ChatNamespace('/chat'))
     
     # ----- Blueprint -----
     app.register_blueprint(chat_views.bp)

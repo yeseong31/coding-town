@@ -1,53 +1,49 @@
-<html lang="ko">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>Flask-Simple-Chat</title>
-  <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
-          integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
-          crossorigin="anonymous"></script>
-  <script type="text/javascript" charset="utf-8">
-      let socket;
-      $(document).ready(function () {
-          socket = io.connect('http://' + document.domain + ':' + location.port + '/chat');
-          socket.on('connect', function () {
-              socket.emit('joined', {});
-          });
-          socket.on('status', function (data) {
-              $('#chat').val($('#chat').val() + '<' + data.msg + '>\n');
-              $('#chat').scrollTop($('#chat')[0].scrollHeight);
-          });
-          socket.on('message', function (data) {
-              $('#chat').val($('#chat').val() + data.msg + '\n');
-              $('#chat').scrollTop($('#chat')[0].scrollHeight);
-          });
-          $('#text').keypress(function (e) {
-              const code = e.keyCode || e.which;
-              let text;
-              if (code === 13) {
-                  text = $('#text').val();
-                  $('#text').val('');
-                  socket.emit('text', {msg: text});
-              }
-          });
-      });
-
-      function leave_room() {
-          socket.emit('left', {}, function () {
-              socket.disconnect();
-
-              // go back to the login page
-              window.location.href = "{{ url_for('Chat_index') }}";
-          });
-      }
-  </script>
+  <meta charset="UTF-8">
+  <title>Chat Room</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script type="text/javascript"
+          src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.min.js"></script>
 </head>
 <body>
+<ul id="messages"></ul>
+<label for="myMessage"></label>
+<input type="text" id="myMessage">
+<button id="sendbutton">Send</button>
 
-<h1>Chat Room: {{ room }}</h1>
-<h3>edited by IML</h3>
-<label for="chat"></label><textarea id="chat" cols="80" rows="20"></textarea><br><br>
-<label for="text">{{ name }} </label><input id="text" size="80" placeholder="메시지를 입력해보세요!"><br><br>
-<a href="#" onclick="leave_room();">채팅방 나가기</a>
+<script type="text/javascript">
+    $(document).ready(function () {
+        console.log('http://' + document.domain + ':' + location.port)
+        const socket = io.connect('http://' + document.domain + ':' + location.port);
 
+        socket.on('connect', function () {
+            console.log(socket.connected); // true
+            const msg = "New Connect!";
+            socket.send(msg);
+        });
+
+        socket.on('disconnect', function () {
+            console.log(socket.connected); // false
+            const msg = 'Disconnect';
+            socket.send(msg);
+        });
+
+        socket.on('message', function (msg) {
+            if (msg.type === 'normal') {
+                $('#messages').append('>> ' + msg.message + '<br>');
+            } else {
+                $('#messages').append('<li>' + msg.message + '</li>');
+            }
+            console.log('Received Message: ' + msg.message + ', ' + msg.type)
+        });
+
+        $('#sendbutton').on('click', function () {
+            socket.send($('#myMessage').val());
+            $('#myMessage').val('');
+        });
+    });
+</script>
 </body>
 </html>

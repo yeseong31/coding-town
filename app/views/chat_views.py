@@ -30,16 +30,4 @@ class Index(Resource):
 
 @bp.route('/test', methods=('GET', 'POST'))
 def test():
-    name = session.get('name', '')
-    room = session.get('room', '')
-    if name == '' or room == '':
-        data = {
-            'message': '이름 및 방 이름이 지정되지 않았습니다.'
-        }
-        return make_response(jsonify(data), 500)
-    # data = {
-    #     'name': session['name'],
-    #     'room': session['room']
-    # }
-    # return make_response(jsonify(data), 200)
-    return render_template('chat.html', name=name, room=room)
+    return render_template('chat.html')
