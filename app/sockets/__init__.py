@@ -1,12 +1,6 @@
-from flask_socketio import send, emit, join_room, leave_room
+from flask_socketio import SocketIO, emit, send, join_room, leave_room
 
-from app import create_app, sio
-
-app = create_app()
-
-if __name__ == '__main__':
-    sio.run(app)
-
+sio = SocketIO(cors_allowed_origins="*", logger=True, engineio_logger=True)
 
 to_client = dict()
 
@@ -17,7 +11,7 @@ def on_connect(auth):
     print('Client connected')
     emit('my response', {'data': 'Connected'})
 
-    
+
 @sio.on('disconnect')
 def on_disconnect():
     """Socket Disconnect 이벤트 감지"""
@@ -40,8 +34,8 @@ def on_message(msg):
         to_client['type'] = 'normal'
         emit('status', {'msg': f'message: {msg}'})
     send(to_client, broadcast=True)
-    
-    
+
+
 @sio.on('join')
 def on_join(data):
     """Socket Rooms 입장 이벤트 감지"""

@@ -1,10 +1,10 @@
 from flask import Flask, render_template
 from flask_cors import CORS
 from flask_restx import Api
-from flask_socketio import SocketIO
+
+from app.sockets import sio
 
 app = Flask(__name__, static_url_path='/static')
-sio = SocketIO(app, cors_allowed_origins="*", logger=True, engineio_logger=True)
 
 
 def page_not_found(e):
@@ -33,11 +33,6 @@ def create_app():
     
     # --- WebRTC ---
     sio.init_app(app)
-
-    # ----- WebRTC Namespace -----
-    # 1204 removed
-    # from .events import ChatNamespace
-    # sio.on_namespace(ChatNamespace('/chat'))
     
     # ----- Blueprint -----
     app.register_blueprint(chat_views.bp)
