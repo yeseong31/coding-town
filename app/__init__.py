@@ -4,14 +4,13 @@ from flask_restx import Api
 
 from app.sockets import sio
 
-app = Flask(__name__, static_url_path='/static')
-
 
 def page_not_found(e):
     return render_template('404.html'), 404
 
 
 def create_app():
+    app = Flask(__name__, static_url_path='/static')
     app.config.from_envvar('APP_CONFIG_FILE')
     CORS(app)
     
