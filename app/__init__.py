@@ -13,10 +13,10 @@ def create_app():
     app = Flask(__name__, static_url_path='/static')
     app.config.from_envvar('APP_CONFIG_FILE')
     CORS(app)
-    
+
     # ----- Error Page -----
     app.register_error_handler(404, page_not_found)
-    
+
     # ----- Api -----
     from .views import chat_views
     api = Api(
@@ -29,11 +29,15 @@ def create_app():
         license='MIT'
     )
     api.add_namespace(chat_views.ns, '/chat')
-    
+
     # --- WebRTC ---
-    sio.init_app(app)
-    
+    sio.init_app(app,
+                 cors_allowed_origins='*',
+                 logger=True,
+                 engineio_logger=True)
+    # sio.init_app(app)
+
     # ----- Blueprint -----
     app.register_blueprint(chat_views.bp)
-    
+
     return app
