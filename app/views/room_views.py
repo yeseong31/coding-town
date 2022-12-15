@@ -1,5 +1,12 @@
-from flask import request, session, render_template, make_response, jsonify, Blueprint
+import secrets
+from datetime import datetime
+
+import bcrypt
+from flask import request, render_template, make_response, jsonify, Blueprint, flash
 from flask_restx import Namespace, Resource, fields
+
+from app import db
+from app.models import Room, User
 
 bp = Blueprint('room', __name__, url_prefix='/')
 
@@ -19,7 +26,7 @@ room_fields = ns.model(
 
 
 @ns.route('room')
-@ns.doc(responses={200: 'Success', 500: 'Failed'})
+@ns.doc(responses={200: 'OK', 201: 'Created', 400: 'Bad Request', 500: 'Failed'})
 class CreateRoom(Resource):
     @ns.expect(room_fields)
     def post(self):
@@ -34,17 +41,40 @@ class CreateRoom(Resource):
         - roomCode: 생성된 방의 고유한 6자리 랜덤 번호
         """
 
+        # 유효성 검사
         room_name = request.json.get('roomName')
-        nickname = request.json.get('nickName')
         password = request.json.get('password')
+        nickname = request.json.get('nickName')
 
-        # 해당 방 이름이 존재하지 않으면 입장 불가
+        if not (room_name or password or nickname):
+            message = '필요한 데이터가 제대로 전달되지 않았습니다.'
+            flash(message)
+            return make_response(jsonify({'message': message}), 400)
+
+        # 사용자 확인
+        user = User.query.filter_by(nickname=nickname).first()
+        if not user:
+            user = User(nickname=nickname)
+            db.session.add(user)
+            db.session.commit()
+
+        # 태그 확인
         # ...
-        # 비밀번호가 일치하지 않으면 입장 불가
-        # ...
+
+        # 방 생성
+        room = Room(room_name=room_name,
+                    room_code=123456,  # DB의 내용과 중복되지 않는 랜덤한 수로 바꿔야 함... secrets로 완전 난수 생성은?
+                    is_private=False if password == '' or password is None else True,
+                    password=bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()),
+                    current_user=0,
+                    total_user=10,
+                    room_owner=user.id,
+                    created_at=datetime.now())
+        db.session.add(room)
+        db.session.commit()
 
         response_data = {
-            'roomCode': 000000
+            'roomCode': room.room_code
         }
         return make_response(jsonify(response_data))
 

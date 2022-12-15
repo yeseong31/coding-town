@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restx import Api
@@ -27,6 +28,7 @@ def create_app():
     app = Flask(__name__, static_url_path='/static')
     app.config.from_envvar('APP_CONFIG_FILE')
     CORS(app)
+    Bcrypt(app)
 
     # ----- Error Page -----
     app.register_error_handler(404, page_not_found)
