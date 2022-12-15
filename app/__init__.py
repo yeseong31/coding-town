@@ -40,7 +40,7 @@ def create_app():
     from . import models
 
     # ----- Api -----
-    from .views import chat_views
+    from .views import room_views, lobby_views
     api = Api(
         app,
         version='0.1',
@@ -50,7 +50,8 @@ def create_app():
         contact_email='yeseong31@naver.com',
         license='MIT'
     )
-    api.add_namespace(chat_views.ns, '/chat')
+    api.add_namespace(room_views.ns, '/')
+    api.add_namespace(lobby_views.ns, '/lobby')
 
     # --- WebRTC ---
     sio.init_app(app,
@@ -60,6 +61,6 @@ def create_app():
     # sio.init_app(app)
 
     # ----- Blueprint -----
-    app.register_blueprint(chat_views.bp)
+    app.register_blueprint(room_views.bp)
 
     return app
