@@ -21,7 +21,13 @@ migrate = Migrate()
 
 
 def page_not_found(e):
+    """404 Not Found 페이지"""
     return render_template('404.html'), 404
+
+
+def bad_gateway(e):
+    """502 Bad Gateway 페이지"""
+    return render_template('502.html'), 502
 
 
 def create_app():
@@ -32,6 +38,7 @@ def create_app():
 
     # ----- Error Page -----
     app.register_error_handler(404, page_not_found)
+    app.register_error_handler(502, bad_gateway)
     
     # ----- DB -----
     db.init_app(app)
@@ -60,7 +67,6 @@ def create_app():
                  cors_allowed_origins='*',
                  logger=True,
                  engineio_logger=True)
-    # sio.init_app(app)
 
     # ----- Blueprint -----
     app.register_blueprint(room_views.bp)

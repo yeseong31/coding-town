@@ -1,4 +1,3 @@
-import secrets
 from datetime import datetime
 
 import bcrypt
@@ -57,9 +56,6 @@ class CreateRoom(Resource):
             user = User(nickname=nickname)
             db.session.add(user)
             db.session.commit()
-
-        # 태그 확인
-        # ...
 
         # 방 생성
         room = Room(room_name=room_name,

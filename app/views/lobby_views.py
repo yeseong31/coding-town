@@ -1,8 +1,7 @@
 from flask import make_response, jsonify, request
 from flask_restx import Namespace, Resource
 
-from app import db
-from app.models import Room, User, Tag
+from app.models import Room, User
 
 ns = Namespace(
     name="Lobby",
