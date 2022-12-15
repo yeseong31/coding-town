@@ -32,6 +32,7 @@ def create_app():
     app.register_error_handler(404, page_not_found)
     
     # ----- DB -----
+    db.init_app(app)
     if app.config['SQLALCHEMY_DATABASE_URI'].startswith("sqlite"):
         migrate.init_app(app, db, render_as_batch=True)
     else:
