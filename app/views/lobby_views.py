@@ -9,7 +9,7 @@ ns = Namespace(
 )
 
 
-@ns.route('')
+@ns.route('/')
 @ns.doc(responses={200: 'Success', 500: 'Failed'},
         params={
             'search': {'in': 'query', 'description': '검색어', 'required': False}
@@ -18,7 +18,7 @@ class Lobby(Resource):
     def get(self):
         """Lobby 정보 조회
 
-        :parameter
+        :argument
         - search: 검색어 (방 이름, 태그 이름 등. 입력이 없으면 전체 방 정보 조회)
 
         :returns

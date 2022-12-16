@@ -25,7 +25,7 @@ room_fields = ns.model(
 )
 
 
-@ns.route('room')
+@ns.route('/')
 @ns.doc(responses={200: 'OK', 201: 'Created', 400: 'Bad Request', 500: 'Failed'})
 class CreateRoom(Resource):
     @ns.expect(room_fields)

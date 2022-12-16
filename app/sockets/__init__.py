@@ -38,7 +38,12 @@ def on_message(msg):
 
 @sio.on('join')
 def on_join(data):
-    """Socket Rooms 입장 이벤트 감지"""
+    """Socket Rooms 입장 이벤트 감지
+
+    :parameter
+    - nickName: 사용자 닉네임
+    - roomCode: 입장하고자 하는 방 코드
+    """
     nickname = data['nickName']
     room_code = data['roomCode']
     join_room(room_code)
@@ -47,7 +52,12 @@ def on_join(data):
 
 @sio.on('leave')
 def on_leave(data):
-    """Socket Rooms 퇴실 이벤트 감지"""
+    """Socket Rooms 퇴장 이벤트 감지
+
+    :parameter
+    - nickName: 사용자 닉네임
+    - roomCode: 퇴장하고자 하는 방 코드
+    """
     nickname = data['nickName']
     room_code = data['roomCode']
     leave_room(room_code)

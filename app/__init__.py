@@ -54,12 +54,13 @@ def create_app():
         app,
         version='0.1',
         title='Coding Town API Server',
-        description="YS's Coding Town API Server",
+        description="Coding Town API Server Swagger Docs",
         terms_url='/',
         contact_email='yeseong31@naver.com',
-        license='MIT'
+        license='MIT',
+        doc='/'
     )
-    api.add_namespace(room_views.ns, '/')
+    api.add_namespace(room_views.ns, '/room')
     api.add_namespace(lobby_views.ns, '/lobby')
 
     # --- WebRTC ---
