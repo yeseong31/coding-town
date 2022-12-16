@@ -39,6 +39,13 @@
             console.log('Received Message: ' + msg.message + ', ' + msg.type)
         });
 
+        // Connect & Enter the room to websocket
+        var ss = io.connect('http://' + document.domain + ':' + location.port);
+        joinRoom("Lounge");
+        function joinRoom(room,username) {
+            ss.emit('join', {'nickName': 'test1234', 'roomCode': 'room1234'});
+        }
+
         $('#sendbutton').on('click', function () {
             socket.send($('#myMessage').val());
             $('#myMessage').val('');

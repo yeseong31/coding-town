@@ -39,16 +39,16 @@ def on_message(msg):
 @sio.on('join')
 def on_join(data):
     """Socket Rooms 입장 이벤트 감지"""
-    username = data['username']
-    room = data['room']
-    join_room(room)
-    send(f'{username} has entered the room.', to=room)
+    nickname = data['nickName']
+    room_code = data['roomCode']
+    join_room(room_code)
+    send(f'{nickname} has entered the room.', to=room_code)
 
 
 @sio.on('leave')
 def on_leave(data):
     """Socket Rooms 퇴실 이벤트 감지"""
-    username = data['username']
-    room = data['room']
-    leave_room(room)
-    send(f'{username} has left the room.', to=room)
+    nickname = data['nickName']
+    room_code = data['roomCode']
+    leave_room(room_code)
+    send(f'{nickname} has left the room.', to=room_code)
