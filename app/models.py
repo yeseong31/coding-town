@@ -26,7 +26,7 @@ class Room(db.Model):
     """방 정보"""
     id = db.Column(db.Integer, primary_key=True)
     room_name = db.Column(db.String(50), nullable=False)
-    room_code = db.Column(db.String(6), nullable=False)
+    room_code = db.Column(db.String(6), nullable=False, unique=True)
     is_private = db.Column(db.Boolean, nullable=False)
     password = db.Column(db.String(50), nullable=True)
     current_user = db.Column(db.Integer, nullable=True)

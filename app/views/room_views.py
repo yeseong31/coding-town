@@ -1,3 +1,4 @@
+import random
 from datetime import datetime
 
 import bcrypt
@@ -57,9 +58,12 @@ class CreateRoom(Resource):
             db.session.add(user)
             db.session.commit()
 
+        # 랜덤 시드 설정
+        random.seed()
+
         # 방 생성
         room = Room(room_name=room_name,
-                    room_code=123456,  # DB의 내용과 중복되지 않는 랜덤한 수로 바꿔야 함... secrets로 완전 난수 생성은?
+                    room_code=int(random.random() * 10 ** 6),
                     is_private=False if password == '' or password is None else True,
                     password=bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()),
                     current_user=0,
