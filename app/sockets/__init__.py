@@ -44,11 +44,32 @@ def on_join(data):
     - nickName: 사용자 닉네임
     - roomCode: 입장하고자 하는 방 코드
     """
+    from app.models import Room
+    from app import db
+    
     nickname = data['nickName']
     room_code = data['roomCode']
-    join_room(room_code)
-    send(f'{nickname} has entered the room.', to=room_code)
-
+    
+    room = Room.query.filter_by(room_code=room_code).first()
+    # 해당 코드를 가지는 방이 없는 경우
+    if room is None:
+        to_client['message'] = 'Invalid code entered.'
+        to_client['type'] = 'error'
+        response_data = {'message': to_client["message"], 'status_code': 400}
+        emit('status', response_data)
+    # 더 이상 참석이 불가능한 경우
+    elif room.current_user == room.total_user:
+        to_client['message'] = 'The room is full.'
+        to_client['type'] = 'error'
+        response_data = {'message': to_client["message"], 'status_code': 400}
+        emit('status', response_data)
+    # 방 입장
+    else:
+        room.current_user += 1
+        db.session.commit()
+        join_room(room_code)
+        send(f'{nickname} has entered the room.', to=room_code)
+    
 
 @sio.on('leave')
 def on_leave(data):
@@ -58,7 +79,29 @@ def on_leave(data):
     - nickName: 사용자 닉네임
     - roomCode: 퇴장하고자 하는 방 코드
     """
+    from app.models import Room
+    from app import db
+    
     nickname = data['nickName']
     room_code = data['roomCode']
-    leave_room(room_code)
-    send(f'{nickname} has left the room.', to=room_code)
+    
+    room = Room.query.filter_by(room_code=room_code).first()
+    # 해당 코드를 가지는 방이 없는 경우
+    if room is None:
+        to_client['message'] = 'Invalid code entered.'
+        to_client['type'] = 'error'
+        response_data = {'message': to_client["message"], 'status_code': 400}
+        emit('status', response_data)
+    # 더 이상 퇴장이 불가능한 경우
+    elif room.current_user == 0:
+        to_client['message'] = 'The room is already empty.'
+        to_client['type'] = 'error'
+        response_data = {'message': to_client["message"], 'status_code': 400}
+        emit('status', response_data)
+    # 방 퇴장
+    else:
+        room.current_user -= 1
+        db.session.commit()
+        leave_room(room_code)
+        send(f'{nickname} has left the room.', to=room_code)
+    
