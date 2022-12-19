@@ -9,7 +9,7 @@ to_client = dict()
 def on_connect(auth):
     """Socket Connect 이벤트 감지"""
     print('Client connected')
-    emit('my response', {'data': 'Connected'})
+    emit('connect', {'data': 'Connected'})
 
 
 @sio.on('disconnect')
@@ -24,21 +24,21 @@ def on_message(msg):
     if msg == 'New Connect!':
         to_client['message'] = 'welcome!'
         to_client['type'] = 'connect'
-        emit('status', {'msg': 'connect'})
+        emit('message', {'msg': 'connect'})
     elif msg == 'Disconnect':
         to_client['message'] = 'bye bye'
         to_client['type'] = 'disconnect'
-        emit('status', {'msg': 'disconnect'})
+        emit('message', {'msg': 'disconnect'})
     else:
         to_client['message'] = msg
         to_client['type'] = 'normal'
-        emit('status', {'msg': f'message: {msg}'})
+        emit('message', {'msg': f'message: {msg}'})
     send(to_client, broadcast=True)
 
 
-@sio.on('join')
-def on_join(data):
-    """Socket Rooms 입장 이벤트 감지
+@sio.on('create')
+def on_create(data):
+    """Socket Rooms 입장 이벤트
 
     :parameter
     - nickName: 사용자 닉네임
@@ -46,29 +46,29 @@ def on_join(data):
     """
     from app.models import Room
     from app import db
-    
+
     nickname = data['nickName']
     room_code = data['roomCode']
-    
+
     room = Room.query.filter_by(room_code=room_code).first()
     # 해당 코드를 가지는 방이 없는 경우
     if room is None:
-        to_client['message'] = 'Invalid code entered.'
-        to_client['type'] = 'error'
-        response_data = {'message': to_client["message"], 'status_code': 400}
-        emit('status', response_data)
+        response_data = {'message': 'Invalid code entered.', 'status_code': 400, 'isSuccess': False}
+        emit('join', response_data)
+        # send(response_data)
     # 더 이상 참석이 불가능한 경우
     elif room.current_user == room.total_user:
-        to_client['message'] = 'The room is full.'
-        to_client['type'] = 'error'
-        response_data = {'message': to_client["message"], 'status_code': 400}
-        emit('status', response_data)
+        response_data = {'message': 'The room is full.', 'status_code': 400, 'isSuccess': False}
+        emit('join', response_data)
+        # send(response_data)
     # 방 입장
     else:
         room.current_user += 1
         db.session.commit()
-        join_room(room_code)
-        send(f'{nickname} has entered the room.', to=room_code)
+        join_room(room_code)  # 자동으로 빈 방을 만듦
+        response_data = {'isSuccess': True}
+        emit('join', response_data)
+        # send(f'{nickname} has entered the room.', to=room_code)
     
 
 @sio.on('leave')
