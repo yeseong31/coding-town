@@ -33,7 +33,7 @@ class Room(db.Model):
     total_user = db.Column(db.Integer, nullable=True)
     # tag_id = db.relationship('Tag', backref=db.backref('tag_set', cascade='all, delete-orphan'))
     room_owner = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
-    room_participant = db.relationship('User', backref=db.backref('user_set', cascade='all, delete-orphan'))
+    room_participant = db.relationship('User', secondary=room_user, backref=db.backref('user_set'))
     created_at = db.Column(db.DateTime(), nullable=False)
     modified_at = db.Column(db.DateTime(), nullable=True)
     
