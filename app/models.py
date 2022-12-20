@@ -29,7 +29,6 @@ class Room(db.Model):
     room_code = db.Column(db.String(6), nullable=False, unique=True)
     is_private = db.Column(db.Boolean, nullable=False)
     password = db.Column(db.String(50), nullable=True)
-    current_user = db.Column(db.Integer, nullable=True, default=1)
     total_user = db.Column(db.Integer, nullable=True)
     # tag_id = db.relationship('Tag', backref=db.backref('tag_set', cascade='all, delete-orphan'))
     room_owner = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
