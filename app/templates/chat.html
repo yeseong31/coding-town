@@ -43,7 +43,7 @@
         var ss = io.connect('http://' + document.domain + ':' + location.port);
         joinRoom("Lounge");
         function joinRoom(room,username) {
-            ss.emit('join', {'nickName': 'test1234', 'roomCode': 'room1234'});
+            ss.emit('create', {'roomName': 'room1', 'password': 'password1', 'nickName': 'myname12'});
         }
 
         $('#sendbutton').on('click', function () {
