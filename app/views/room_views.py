@@ -2,7 +2,7 @@ import random
 from datetime import datetime
 
 import bcrypt
-from flask import request, render_template, make_response, jsonify, Blueprint, flash
+from flask import request, render_template, make_response, jsonify, Blueprint, flash, session
 from flask_restx import Namespace, Resource, fields
 
 from app import db
@@ -72,6 +72,11 @@ class CreateRoom(Resource):
                     created_at=datetime.now())
         db.session.add(room)
         db.session.commit()
+
+        # 세션에 방 이름 저장
+        session['roomId'] = room.id
+        session['roomName'] = room_name
+        print(session['roomId'], session['roomName'])
 
         response_data = {
             'roomCode': room.room_code

@@ -1,5 +1,5 @@
 from flask import request
-from flask_socketio import SocketIO, emit, send
+from flask_socketio import SocketIO, emit, send, join_room
 
 sio = SocketIO(cors_allowed_origins="*", logger=True, engineio_logger=True)
 
@@ -43,50 +43,37 @@ def on_create(data):
     """Room 입장에 필요한 정보를 확인한 뒤 입장 코드 반환
 
     :argument
-        - roomName: 생성할 방 이름
         - nickName: 방 생성자 닉네임
-        - password: 방 비밀번호
+        - roomCode: 입장하려는 방 코드
 
     :returns
-        - roomCode: 생성된 방의 고유한 6자리 랜덤 번호
+        - isSuccess: 방 생성 성공 여부
     """
     # load packages
-    import random
-    from datetime import datetime
-
-    import bcrypt
-
-    from app import db
-    from app.models import Room, User
+    from app.models import Room
 
     # 데이터 확인
-    room_name = data['roomName']
-    password = data['password']
     nickname = data['nickName']
+    room_code = data['roomCode']
 
-    # 사용자 확인
-    user = User.query.filter_by(nickname=nickname).first()
-    if not user:
-        user = User(nickname=nickname)
-        db.session.add(user)
-        db.session.commit()
+    # 방 조회
+    room = Room.query.filter_by(room_code=room_code).first()
+    if not room:
+        emit('create', {'isSuccess': False})
+    else:
+        join_room(room_code)
+        emit('create', {'isSuccess': True})
+        send(nickname + ' has entered the room.', to=room_code)
 
-    # 랜덤 시드 설정
-    random.seed()
 
-    # 방 생성
-    room = Room(room_name=room_name,
-                room_code=int(random.random() * 10 ** 6),
-                is_private=False if password == '' or password is None else True,
-                password=bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()),
-                current_user=0,
-                total_user=10,
-                room_owner=user.id,
-                created_at=datetime.now())
-    db.session.add(room)
-    # db.session.commit()
-    # 방 코드 전달
-    emit('create', {'roomCode': room.room_code})
+@sio.on('join')
+def on_join(data):
+    """새로운 사람이 Room 참여 정보를 기존 Room 참여자들에게 전달
+
+    :argument:
+        - roomCode: 입장하려는 방 코드
+        - sdp: 새로운 참여자의 peer 정보
+    """
 
 
 @sio.on('offer')
