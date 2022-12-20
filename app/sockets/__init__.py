@@ -53,6 +53,7 @@ def on_create(data):
     from app.models import Room
 
     # 데이터 확인
+    sid = request.sid
     nickname = data['nickName']
     room_code = data['roomCode']
 
@@ -71,9 +72,30 @@ def on_join(data):
     """새로운 사람이 Room 참여 정보를 기존 Room 참여자들에게 전달
 
     :argument:
+        - nickName: 방 참여자 닉네임
         - roomCode: 입장하려는 방 코드
-        - sdp: 새로운 참여자의 peer 정보
     """
+    # load packages
+    from app import db
+    from app.models import User, Room
+
+    # 데이터 확인
+    sid = request.sid
+    nickname = data['nickName']
+    room_code = data['roomCode']
+
+    # 참여자 추가
+    user = User(nickname=nickname)
+    room = Room.query.filter_by(room_code=room_code).first()
+    if not room:
+        emit('join', {'message': 'Room does not exist.'})
+    else:
+        room.room_participant.append(user.id)
+        room.current_user += 1
+        db.session.add(user)
+        db.session.commit()
+        emit('join', {'nickName': nickname}, room=room_code)
+        # send(nickname + ' has entered the room.', to=room_code)
 
 
 @sio.on('offer')
