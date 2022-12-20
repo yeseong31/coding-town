@@ -94,7 +94,7 @@ def on_join(data):
         room.current_user += 1
         db.session.add(user)
         db.session.commit()
-        emit('join', {'message': 'The room exists.', 'nickName': nickname}, room=room_code)
+        emit('join', {'message': 'The room exists.', 'nickName': nickname}, to=room_code)
         send(nickname + ' has entered the room.', to=room_code)
 
 
