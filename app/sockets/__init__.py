@@ -85,7 +85,9 @@ def on_join(data):
     room_code = data['roomCode']
 
     # 참여자 추가
-    user = User(nickname=nickname)
+    user = User.query.filter_by(nickname=nickname).first()
+    if not user:
+        user = User(nickname=nickname)
     room = Room.query.filter_by(room_code=room_code).first()
     if not room:
         emit('join', {'message': 'Room does not exist.'})
