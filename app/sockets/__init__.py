@@ -95,7 +95,7 @@ def on_join(data):
         db.session.add(user)
         db.session.commit()
         emit('join', {'nickName': nickname}, room=room_code)
-        # send(nickname + ' has entered the room.', to=room_code)
+        send(nickname + ' has entered the room.', to=room_code)
 
 
 @sio.on('offer')
