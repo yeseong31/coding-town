@@ -40,7 +40,8 @@ def on_message(msg):
 
 @sio.on('create')
 def on_create(data):
-    """Room 입장에 필요한 정보를 확인한 뒤 입장 코드 반환
+    """
+    Room 입장에 필요한 정보를 확인한 뒤 입장 코드 반환
 
     :argument
         - nickName: 방 생성자 닉네임
@@ -69,7 +70,8 @@ def on_create(data):
 
 @sio.on('join')
 def on_join(data):
-    """새로운 사람이 Room 참여 정보를 기존 Room 참여자들에게 전달
+    """
+    새로운 사람이 Room 참여 정보를 기존 Room 참여자들에게 전달
 
     :argument:
         - nickName: 방 참여자 닉네임
@@ -101,9 +103,30 @@ def on_join(data):
 
 @sio.on('offer')
 def on_offer(data):
+    """
+    기존 참여자들의 정보를 서버로 전달
+    
+    :argument:
+        - roomCode: 입장하려는 방 코드
+        - sdp: 참여자의 peer 정보
+    """
+    sid = request.sid
+    room_code = data['roomCode']
+    sdp = data['sdp']
+    print(sid)
     pass
 
 
 @sio.on('answer')
 def on_answer(data):
+    """
+    새로운 참여자의 정보를 서버로 전달
+
+    :argument:
+        - roomCode: 입장하려는 방 코드
+        - sdp: 참여자의 peer 정보
+    """
+    sid = request.sid
+    room_code = data['roomCode']
+    sdp = data['sdp']
     pass
