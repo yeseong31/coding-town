@@ -28,7 +28,6 @@ class Lobby(Resource):
             - roomCode: 방에 부여된 고유한 6자리 랜덤 번호
             - tags: 방에 설정된 태그
             - isPrivate: 비밀번호가 걸린 방인지 확인
-            - currentUser: 방 참여자 수
             - totalUser: 방에 참여 가능한 참여자 수
         """
 
@@ -52,7 +51,6 @@ class Lobby(Resource):
                 'roomCode': room.room_code,
                 'tags': ['test', 'coding-town', 'tags'],
                 'isPrivate': room.is_private,
-                'currentUser': room.current_user,
                 'totalUser': room.total_user
             }
             rooms.append(data)
