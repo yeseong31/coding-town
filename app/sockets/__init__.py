@@ -186,7 +186,42 @@ def on_answer(data):
         - roomCode: 입장하려는 방 코드
         - sdp: 참여자의 peer 정보
     """
+    from flask import session
+    from app import db
+    from app.models import Room, User
+
     sid = request.sid
     room_code = data['roomCode']
     sdp = data['sdp']
-    pass
+
+    try:
+        nickname = session['nickName']
+    except KeyError:
+        nickname = 'test_nickname1'
+
+    user = User.query.filter_by(nickname=nickname)
+    room = Room.query.filter_by(room_code=room_code).first()
+
+    # 세션에 새로운 참여자의 정보가 없는 경우
+    if not nickname:
+        emit('answer', {'message': 'Invalid call. The information of the new participant has not been passed on.'})
+    # 등록되지 않은 사용자인 경우
+    elif not user:
+        emit('answer', {'message': 'Invalid call. User does not exist.'})
+    # 방이 존재하지 않는 경우
+    elif not room:
+        emit('answer', {'message': "Invalid call. This room doesn't exist."})
+    # 새로운 참여자의 정보를 기존 참여자들에게 전달
+    else:
+        response_data = {
+            'message': 'The information of the user currently in the room.',
+            'roomCode': room_code,
+            'sdp': sdp
+        }
+        for target in room.room_participant:
+            emit('offer', response_data, to=target.id)
+
+        # 새로운 참여자를 방으로 초대
+        room.room_participant.append(user)
+        db.session.add(user)
+        db.session.commit()
