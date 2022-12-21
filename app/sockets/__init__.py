@@ -93,14 +93,14 @@ def on_create(data):
 @sio.on('join')
 def on_join(data):
     """
-    새로운 사람이 Room 참여 정보를 기존 Room 참여자들에게 전달
+    새로운 사람의 Room 참여 정보를 기존 Room 참여자들에게 전달
 
     :argument:
         - nickName: 방 참여자 닉네임
         - roomCode: 입장하려는 방 코드
     """
     # load packages
-    from app import db
+    from flask import session
     from app.models import User, Room
 
     # 데이터 확인
@@ -108,19 +108,30 @@ def on_join(data):
     nickname = data['nickName']
     room_code = data['roomCode']
 
+    response_data = {}
+
+    # 세션에 참여자의 이름 저장
+    session['nickName'] = nickname
+
     # 참여자 추가
     user = User.query.filter_by(nickname=nickname).first()
     if not user:
+        response_data['warning'] = "Create a new user because it does not exist."
         user = User(nickname=nickname)
+
+    # 존재하지 않는 방인 경우
     room = Room.query.filter_by(room_code=room_code).first()
     if not room:
-        emit('join', {'message': 'Room does not exist.'})
+        response_data['message'] = "This room doesn't exist."
+    # 이미 만석인 방인 경우
+    elif len(room.room_participant) >= room.total_user:
+        response_data['message'] = "The room is already full."
+    # 방에 참여할 수 있는 경우
     else:
-        room.room_participant.append(user)
-        db.session.add(user)
-        db.session.commit()
-        emit('join', {'message': 'The room exists.', 'nickName': nickname}, to=room_code)
+        response_data['message'] = 'The room exists.'
+        response_data['nickName'] = nickname
         send(nickname + ' has entered the room.', to=room_code)
+    emit('join', response_data, to=room_code)
 
 
 @sio.on('offer')
