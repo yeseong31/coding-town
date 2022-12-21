@@ -51,21 +51,43 @@ def on_create(data):
         - isSuccess: 방 생성 성공 여부
     """
     # load packages
-    from app.models import Room
+    from app import db
+    from app.models import Room, User
 
     # 데이터 확인
     sid = request.sid
     nickname = data['nickName']
     room_code = data['roomCode']
 
-    # 방 조회
+    # 방, 사용자 조회
     room = Room.query.filter_by(room_code=room_code).first()
+    user = User.query.filter_by(nickname=nickname).first()
+    # 방이 존재하지 않는 경우
     if not room:
-        emit('create', {'isSuccess': False})
+        response_data = {
+            'message': "This room doesn't exist.",
+            'isSuccess': False
+        }
+        emit('create', {'message': "This room doesn't exist.", 'isSuccess': False})
+    # 방 생성자가 아닌 경우
+    elif room.room_owner != user.id:
+        response_data = {
+            'message': "The nickname you received is different from the nickname of the room creator.",
+            'isSuccess': False}
+    # 방 생성
     else:
+        # 방 생성자를 방 참여자로 포함
+        room.room_participant.append(user)
+        db.session.add(user)
+        db.session.commit()
+        # 방 진입
         join_room(room_code)
-        emit('create', {'isSuccess': True})
         send(nickname + ' has entered the room.', to=room_code)
+        response_data = {
+            'message': f"{nickname} has entered the room.",
+            'isSuccess': True
+        }
+    emit('create', response_data)
 
 
 @sio.on('join')
@@ -105,7 +127,7 @@ def on_join(data):
 def on_offer(data):
     """
     기존 참여자들의 정보를 서버로 전달
-    
+
     :argument:
         - roomCode: 입장하려는 방 코드
         - sdp: 참여자의 peer 정보
