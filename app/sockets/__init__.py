@@ -137,17 +137,44 @@ def on_join(data):
 @sio.on('offer')
 def on_offer(data):
     """
-    기존 참여자들의 정보를 서버로 전달
+    기존 참여자들의 정보를 새로운 참여자에게 전달
 
     :argument:
         - roomCode: 입장하려는 방 코드
         - sdp: 참여자의 peer 정보
     """
+    from flask import session
+    from app.models import Room, User
+
     sid = request.sid
     room_code = data['roomCode']
     sdp = data['sdp']
-    print(sid)
-    pass
+
+    try:
+        nickname = session['nickName']
+    except KeyError:
+        nickname = 'test_nickname1'
+
+    user = User.query.filter_by(nickname=nickname).first()
+    room = Room.query.filter_by(room_code=room_code).first()
+
+    # 세션에 기존 참여자의 정보가 없는 경우
+    if not nickname:
+        emit('offer', {'message': 'Invalid call. The information of the new participant has not been passed on.'})
+    # 등록되지 않은 사용자인 경우
+    elif not user:
+        emit('offer', {'message': 'Invalid call. User does not exist.'})
+    # 방이 존재하지 않는 경우
+    elif not room:
+        emit('offer', {'message': "Invalid call. This room doesn't exist."})
+    # 기존 참여자들의 정보를 새로운 참여자에게 전달
+    else:
+        response_data = {
+            'message': 'The information of the user currently in the room.',
+            'roomCode': room_code,
+            'sdp': sdp
+        }
+        emit('offer', response_data, to=user.id)
 
 
 @sio.on('answer')
