@@ -51,6 +51,7 @@ class Lobby(Resource):
                 'roomCode': room.room_code,
                 'tags': ['test', 'coding-town', 'tags'],
                 'isPrivate': room.is_private,
+                'currentUser': len(room.room_participant),
                 'totalUser': room.total_user
             }
             rooms.append(data)
