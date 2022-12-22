@@ -65,7 +65,7 @@ class CreateRoom(Resource):
         room = Room(room_name=room_name,
                     room_code=int(random.random() * 10 ** 6),
                     is_private=False if password == '' or password is None else True,
-                    password=bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()),
+                    password='' if not is_private else bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()),
                     total_user=10,
                     room_owner=user.id,
                     created_at=datetime.now())
