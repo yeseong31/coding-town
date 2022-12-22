@@ -32,7 +32,7 @@ class Lobby(Resource):
         """
 
         # 검색어 확인
-        search = request.args.get('search', type=str, default=1)
+        search = request.args.get('search', type=str)
         room_list = Room.query.order_by(Room.created_at)
 
         if search:
