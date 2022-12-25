@@ -1,3 +1,5 @@
+from django.shortcuts import render
+
 from config.wsgi import sio
 
 
@@ -9,3 +11,7 @@ def on_connect(sid):
 @sio.on('disconnect')
 def on_disconnect(sid):
     print('Client disconnected')
+    
+    
+def test(request):
+    return render(request, 'chat.html')
