@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat Room</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script type="text/javascript"
+          src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.min.js"></script>
+</head>
+<body>
+<ul id="messages"></ul>
+<label for="myMessage"></label>
+<input type="text" id="myMessage">
+<button id="sendbutton">Send</button>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        console.log('http://' + document.domain + ':' + location.port)
+        const socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('connect', function () {
+            console.log(socket.connected); // true
+            const msg = "New Connect!";
+            socket.send(msg);
+        });
+
+        socket.on('disconnect', function () {
+            console.log(socket.connected); // false
+            const msg = 'Disconnect';
+            socket.send(msg);
+        });
+
+        socket.on('message', function (msg) {
+            if (msg.type === 'normal') {
+                $('#messages').append('>> ' + msg.message + '<br>');
+            } else {
+                $('#messages').append('<li>' + msg.message + '</li>');
+            }
+            console.log('Received Message: ' + msg.message + ', ' + msg.type)
+        });
+
+        // Connect & Enter the room to websocket
+        var ss = io.connect('http://' + document.domain + ':' + location.port);
+        joinRoom("Lounge");
+        function joinRoom(room,username) {
+            ss.emit('join', {'nickName': 'nickname1', 'roomCode': '247183'});
+        }
+
+        $('#sendbutton').on('click', function () {
+            socket.send($('#myMessage').val());
+            $('#myMessage').val('');
+        });
+    });
+</script>
+</body>
+</html>
