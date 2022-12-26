@@ -15,6 +15,9 @@ sio = socketio.Server(async_mode=async_mode)
 thread = None
 
 
+to_client = dict()
+
+
 def index(request):
     global thread
     if thread is None:
@@ -33,7 +36,9 @@ def background_thread():
 
 @sio.event
 def connect(sid, environ):
-    sio.emit('my_response', {'data': 'Connected', 'count': 0}, room=sid)
+    """Socket Connect 이벤트 감지"""
+    print(f'[{sid}] Client connected')
+    sio.emit('my_response', {'data': 'Connected', 'count': 0})
     
 
 @sio.event
@@ -43,7 +48,27 @@ def disconnect_request(sid):
     
 @sio.event
 def disconnect(sid):
-    print('Client disconnected')
+    """Socket Disconnect 이벤트 감지"""
+    print(f'[{sid}] Client disconnected')
+    sio.emit('my_response', {'data': 'Disconnected'})
+    
+    
+@sio.event
+def message(sid, msg):
+    """Socket 메시지 송수신 이벤트 감지"""
+    if msg == 'New Connect!':
+        to_client['message'] = 'welcome!'
+        to_client['type'] = 'connect'
+        sio.emit('status', {'msg': 'connect'})
+    elif msg == 'Disconnect':
+        to_client['message'] = 'bye bye'
+        to_client['type'] = 'disconnect'
+        sio.emit('status', {'msg': 'disconnect'})
+    else:
+        to_client['message'] = msg
+        to_client['type'] = 'normal'
+        sio.emit('status', {'msg': f'message: {msg}'})
+    sio.send(to_client, broadcast=True)
     
     
 def test(request):
