@@ -71,5 +71,64 @@ def message(sid, msg):
     sio.send(to_client, broadcast=True)
     
     
+@sio.on('create')
+def create(sid, data):
+    """
+    Room 입장에 필요한 정보를 확인한 뒤 입장 코드 반환
+
+    :argument
+        - nickName: 방 생성자 닉네임
+        - roomCode: 입장하려는 방 코드
+
+    :returns
+        - isSuccess: 방 생성 성공 여부
+    """
+    nickname = data['nickName']
+    room_code = data['roomCode']
+    print(nickname, room_code)
+    
+    
+@sio.on('join')
+def join(sid, data):
+    """
+    새로운 사람의 Room 참여 정보를 기존 Room 참여자들에게 전달
+
+    :argument:
+        - nickName: 방 참여자 닉네임
+        - roomCode: 입장하려는 방 코드
+    """
+    nickname = data['nickName']
+    room_code = data['roomCode']
+    print(nickname, room_code)
+    
+    
+@sio.on('offer')
+def offer(sid, data):
+    """
+    기존 참여자들의 정보를 새로운 참여자에게 전달
+
+    :argument:
+        - roomCode: 입장하려는 방 코드
+        - sdp: 참여자의 peer 정보
+    """
+    room_code = data['roomCode']
+    sdp = data['sdp']
+    print(room_code, sdp)
+    
+    
+@sio.on('answer')
+def answer(sid, data):
+    """
+    새로운 참여자의 정보를 서버로 전달
+
+    :argument:
+        - roomCode: 입장하려는 방 코드
+        - sdp: 참여자의 peer 정보
+    """
+    room_code = data['roomCode']
+    sdp = data['sdp']
+    print(room_code, sdp)
+    
+    
 def test(request):
     return render(request, 'chat.html')
