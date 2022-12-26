@@ -10,12 +10,14 @@ https://docs.djangoproject.com/en/4.1/howto/deployment/wsgi/
 import os
 
 import eventlet.wsgi
-import socketio
 from django.core.wsgi import get_wsgi_application
+from socketio import WSGIApp
+
+from sockets.views.sio_views import sio
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
-django_application = get_wsgi_application()
-sio = socketio.Server(async_mode='eventlet', cors_allowed_origins='*', cors_credentials=True)
-application = socketio.WSGIApp(sio, django_application)
+django_app = get_wsgi_application()
+application = WSGIApp(sio, django_app)
+
 eventlet.wsgi.server(eventlet.listen(('', 8000)), application)

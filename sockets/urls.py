@@ -1,9 +1,9 @@
 from django.urls import path
 
-from sockets.views.sio_views import test
+from sockets.views import sio_views
 
-app_name ='sockets'
+app_name = 'sockets'
 
 urlpatterns = [
-    path('', test, name='test'),
+    path('', sio_views.test, name='test'),
 ]
