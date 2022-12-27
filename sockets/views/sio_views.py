@@ -7,13 +7,15 @@ from django.shortcuts import render
 from config.settings.base import BASE_DIR
 
 # set async_mode to 'threading', 'eventlet', 'gevent' or 'gevent_uwsgi' to
-# force a mode else, the best mode is selected automatically from what's
-# installed
+# force a mode else, the best mode is selected automatically from what's installed
 async_mode = 'eventlet'
 
-sio = socketio.Server(async_mode=async_mode)
+sio = socketio.Server(
+    async_mode=async_mode,
+    cors_allowed_origins='*',
+    logger=True
+)
 thread = None
-
 
 to_client = dict()
 
@@ -39,20 +41,20 @@ def connect(sid, environ):
     """Socket Connect 이벤트 감지"""
     print(f'[{sid}] Client connected')
     sio.emit('my_response', {'data': 'Connected', 'count': 0})
-    
+
 
 @sio.event
 def disconnect_request(sid):
     sio.disconnect(sid)
-    
-    
+
+
 @sio.event
 def disconnect(sid):
     """Socket Disconnect 이벤트 감지"""
     print(f'[{sid}] Client disconnected')
     sio.emit('my_response', {'data': 'Disconnected'})
-    
-    
+
+
 @sio.event
 def message(sid, msg):
     """Socket 메시지 송수신 이벤트 감지"""
@@ -69,8 +71,8 @@ def message(sid, msg):
         to_client['type'] = 'normal'
         sio.emit('status', {'msg': f'message: {msg}'})
     sio.send(to_client, broadcast=True)
-    
-    
+
+
 @sio.on('create')
 def create(sid, data):
     """
@@ -86,8 +88,8 @@ def create(sid, data):
     nickname = data['nickName']
     room_code = data['roomCode']
     print(nickname, room_code)
-    
-    
+
+
 @sio.on('join')
 def join(sid, data):
     """
@@ -100,8 +102,8 @@ def join(sid, data):
     nickname = data['nickName']
     room_code = data['roomCode']
     print(nickname, room_code)
-    
-    
+
+
 @sio.on('offer')
 def offer(sid, data):
     """
@@ -114,8 +116,8 @@ def offer(sid, data):
     room_code = data['roomCode']
     sdp = data['sdp']
     print(room_code, sdp)
-    
-    
+
+
 @sio.on('answer')
 def answer(sid, data):
     """
@@ -128,7 +130,7 @@ def answer(sid, data):
     room_code = data['roomCode']
     sdp = data['sdp']
     print(room_code, sdp)
-    
-    
+
+
 def test(request):
     return render(request, 'chat.html')
