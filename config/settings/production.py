@@ -1,3 +1,5 @@
+from dj_database_url import config
+
 from .base import *
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -14,7 +16,14 @@ ALLOWED_HOSTS = [os.getenv('ELASTIC_IP')]
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        # "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": os.getenv('DB_ENGINE'),
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': int(os.getenv('DB_PORT')),
     }
 }
+
+db_from_env = config(conn_max_age=500)
+DATABASES['default'].update(db_from_env)
