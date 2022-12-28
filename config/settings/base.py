@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     'socketio',
+    'common.apps.CommonConfig',
 ]
 
 MIDDLEWARE = [
@@ -133,4 +134,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Customizing authentication in Django
-AUTH_USER_MODEL = 'customauth.MyUser'
+AUTH_USER_MODEL = 'common.MyUser'
