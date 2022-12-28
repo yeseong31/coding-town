@@ -14,7 +14,7 @@ class RegisterView(generics.CreateAPIView):
 class SigninView(generics.GenericAPIView):
     """사용자 조회 및 로그인: POST"""
     serializer_class = SigninSerializer
-
+    
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
