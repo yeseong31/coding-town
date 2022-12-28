@@ -27,3 +27,5 @@ DATABASES = {
 
 db_from_env = config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
+
+STATICFILES_DIRS = []

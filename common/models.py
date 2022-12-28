@@ -16,16 +16,16 @@ class MyUserManager(BaseUserManager):
             nickname=nickname,
         )
 
-        user.set_password(password)
+        # user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None):
+    def create_superuser(self, nickname, password=None):
         """
         Creates and saves a superuser with the given nickname and password.
         """
         user = self.create_user(
-            email,
+            nickname,
             password=password,
         )
         user.is_admin = True
