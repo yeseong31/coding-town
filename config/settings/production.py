@@ -10,7 +10,6 @@ DEBUG = bool(os.environ.get('DJANGO_DEBUG', True))
 
 ALLOWED_HOSTS = [os.getenv('ELASTIC_IP')]
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -27,5 +26,3 @@ DATABASES = {
 
 db_from_env = config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
-
-STATICFILES_DIRS = []

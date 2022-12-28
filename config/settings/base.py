@@ -21,7 +21,6 @@ environ.Env.read_env(
     env_file=os.path.join(BASE_DIR, '.env')
 )
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
@@ -37,13 +36,13 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     "rest_framework",
-    'rest_framework.authtoken',
+    "rest_framework.authtoken",
     "corsheaders",
 
-    'socketio',
+    "socketio",
 
-    'common.apps.CommonConfig',
-    'sockets.apps.SocketsConfig',
+    "common.apps.CommonConfig",
+    "sockets.apps.SocketsConfig",
 ]
 
 MIDDLEWARE = [
@@ -80,7 +79,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -99,13 +97,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
 }
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
@@ -117,7 +113,6 @@ TIME_ZONE = 'Asia/Seoul'
 USE_I18N = True
 
 USE_TZ = False
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/

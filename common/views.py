@@ -1,8 +1,8 @@
+from rest_framework import generics, status
 from rest_framework.response import Response
 
 from common.models import MyUser as User
 from common.serializers import RegisterSerializer, SigninSerializer
-from rest_framework import generics, status
 
 
 class RegisterView(generics.CreateAPIView):
