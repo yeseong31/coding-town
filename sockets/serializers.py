@@ -12,4 +12,4 @@ class RoomSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Room
-        fields = ('roomName', 'roomCode', 'isPrivate', 'currentUser', 'totalUser',)
+        fields = ('roomName', 'roomCode', 'isPrivate', 'currentUser', 'totalUser', 'tags')
