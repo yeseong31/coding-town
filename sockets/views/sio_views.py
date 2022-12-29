@@ -92,9 +92,9 @@ def create(sid, data):
     owner = data['nickName']
     code = data['roomCode']
     
-    room = Room.objects.get(code=code)
+    room = Room.objects.filter(code=code)
     # 존재하지 않는 Room인 경우
-    if not room:
+    if len(room) == 0:
         response_data = {
             'message': "This room doesn't exist.",
             'isSuccess': False
@@ -132,9 +132,9 @@ def join(sid, data):
     nickname = data['nickName']
     code = data['roomCode']
     
-    room = Room.objects.get(code=code)
+    room = Room.objects.filter(code=code)
     # 존재하지 않는 Room인 경우
-    if not room:
+    if len(room) == 0:
         response_data = {
             'message': "This room doesn't exist.",
             'isSuccess': False
@@ -170,9 +170,9 @@ def offer(sid, data):
     code = data['roomCode']
     sdp = data['sdp']
     
-    room = Room.objects.get(code=code)
+    room = Room.objects.filter(code=code)
     # 존재하지 않는 Room인 경우
-    if not room:
+    if len(room) == 0:
         response_data = {
             'message': "This room doesn't exist.",
             'sdp': None,
@@ -204,9 +204,9 @@ def answer(sid, data):
     code = data['roomCode']
     sdp = data['sdp']
 
-    room = Room.objects.get(code=code)
+    room = Room.objects.filter(code=code)
     # 존재하지 않는 Room인 경우
-    if not room:
+    if len(room) == 0:
         response_data = {
             'message': "This room doesn't exist.",
             'sdp': None,
@@ -238,9 +238,9 @@ def bye(sid, data):
     code = data['roomCode']
     nickname = data['nickName']
     
-    room = Room.objects.get(code=code)
+    room = Room.objects.filter(code=code)
     # 존재하지 않는 Room인 경우
-    if not room:
+    if len(room) == 0:
         response_data = {
             'message': "This room doesn't exist.",
             'isSuccess': False
