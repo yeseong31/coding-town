@@ -46,7 +46,6 @@ def room_post(request):
             is_private=False if password == '' or password is None else True,
             password=bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode(),
             owner=owner,
-            current_num=1,
         )
         room.save()
         

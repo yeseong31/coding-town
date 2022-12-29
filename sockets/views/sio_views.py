@@ -4,7 +4,9 @@ import socketio
 from django.http import HttpResponse
 from django.shortcuts import render
 
+from common.models import MyUser as User
 from config.settings.base import BASE_DIR
+from sockets.models import Room
 
 # set async_mode to 'threading', 'eventlet', 'gevent' or 'gevent_uwsgi' to
 # force a mode else, the best mode is selected automatically from what's installed
@@ -85,10 +87,33 @@ def create(sid, data):
     :returns
         - isSuccess: 방 생성 성공 여부
     """
-    nickname = data['nickName']
-    room_code = data['roomCode']
-    print(nickname, room_code)
-
+    owner = data['nickName']
+    code = data['roomCode']
+    
+    room = Room.objects.get(code=code)
+    # 존재하지 않는 Room인 경우
+    if not room:
+        response_data = {
+            'message': "This room doesn't exist.",
+            'isSuccess': False
+        }
+    # 방 생성자가 아닌 경우
+    elif room.owner != owner:
+        response_data = {
+            'message': "The nickname you received is different from the nickname of the room creator.",
+            'isSuccess': False
+        }
+    # 방 생성
+    else:
+        sio.enter_room(sid, code)
+        room.current_num += 1
+        response_data = {
+            'message': f"{owner} has entered the room.",
+            'isSuccess': True
+        }
+    sio.emit('create', response_data)
+    print(f'[Server] {response_data["message"]}')
+        
 
 @sio.on('join')
 def join(sid, data):
