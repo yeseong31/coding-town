@@ -1,6 +1,8 @@
 import random
 
 import bcrypt
+from django.core.paginator import Paginator
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -26,9 +28,24 @@ class RoomsAPI(APIView):
             - currentUser: Room 현재 입장 인원 수
             - totalUser: Room 입장 제한 인원 수
         """
-        rooms = Room.objects.all()
-        serializer = RoomSerializer(rooms, many=True)
+        page = request.GET.get('page', '1')
+        search = request.GET.get('search', '')
+        room_list = Room.objects.order_by('-created_at')
+
+        if search:
+            room_list = room_list.filter(
+                Q(name__icontains=search) |  # Room 이름 검색
+                Q(owner__icontains=search) |  # Room 생성자 닉네임 검색
+                Q(tags__name__icontains=search)  # Tag 이름 검색
+            ).distinct()
+
+        paginator = Paginator(room_list, 20)
+        page_obj = paginator.get_page(page)
+
+        serializer = RoomSerializer(page_obj, many=True)
         response_data = {
+            'page': page,
+            'search': search,
             'roomCount': len(serializer.data),
             'rooms': serializer.data
         }
