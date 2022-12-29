@@ -1,11 +1,29 @@
 import random
 
 import bcrypt
-from rest_framework import status
+from rest_framework import status, mixins, generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from sockets.models import Room
+from sockets.serializers import RoomSerializer
+
+
+class RoomsAPI(APIView):
+    def get(self, request):
+        """
+        Room 전체 목록 조회
+        :param request:
+        :return:
+        """
+        rooms = Room.objects.all()
+        serializer = RoomSerializer(rooms, many=True)
+        response_data = {
+            'roomCount': len(serializer.data),
+            'rooms': serializer.data
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
 
 
 @api_view(('POST',))
