@@ -10,7 +10,7 @@ class Room(models.Model):
     code = models.CharField(max_length=128, unique=True, verbose_name='room 코드')
     is_private = models.BooleanField(default=False, verbose_name='암호화 여부')
     password = models.CharField(max_length=128, null=True, blank=True, verbose_name='room 비밀번호')
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='rooms', verbose_name='room 생성자')
+    owner = models.CharField(max_length=128, verbose_name='방장 닉네임')
     current_num = models.IntegerField(verbose_name='현재 참가 인원 수')
     total_num = models.IntegerField(default=10, verbose_name='room 제한 인원 수')
     create_at = models.DateTimeField(default=timezone.now, verbose_name='room 생성일')
