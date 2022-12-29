@@ -12,5 +12,6 @@ urlpatterns = [
     path('', sio_views.test, name='test'),
     
     # ----- Room -----
-    path('room/', room_views.room_post, name='room_post'),
+    # Room 생성
+    path('room/create/', room_views.room_post, name='room_post'),
 ]
