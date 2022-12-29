@@ -5,8 +5,7 @@ from common.models import MyUser as User
 
 
 class Room(models.Model):
-    id = models.IntegerField(primary_key=True, verbose_name='room 인덱스')
-    sid = models.CharField(max_length=128, unique=True, verbose_name='room socketio id')
+    sid = models.CharField(max_length=128, null=True, blank=True, verbose_name='room socketio id')
     name = models.CharField(max_length=50, verbose_name='room 이름')
     code = models.CharField(max_length=128, unique=True, verbose_name='room 코드')
     is_private = models.BooleanField(default=False, verbose_name='암호화 여부')
