@@ -14,4 +14,6 @@ urlpatterns = [
     # ----- Room -----
     # Room 생성
     path('room/create/', room_views.room_post, name='room_post'),
+    # Room 참가
+    path('room/join/', room_views.room_join, name='room_join'),
 ]
