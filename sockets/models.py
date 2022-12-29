@@ -24,7 +24,7 @@ class Room(models.Model):
     total_num = models.IntegerField(default=10, verbose_name='room 제한 인원 수')
     create_at = models.DateTimeField(default=timezone.now, verbose_name='room 생성일')
     modified_at = models.DateTimeField(null=True, blank=True, verbose_name='room 수정일')
-    tags = models.ManyToManyField(Tag, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True, related_name='tag_room')
 
     def __str__(self):
         return f'[{self.code}] {self.name}'
