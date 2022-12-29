@@ -81,12 +81,12 @@ def message(sid, msg):
 def create(sid, data):
     """
     Room 입장에 필요한 정보를 확인한 뒤 입장 코드 반환
-
-    :argument
+    :param sid:
+        - SocketIO ID
+    :param data:
         - nickName: 방 생성자 닉네임
         - roomCode: 입장하려는 방 코드
-
-    :returns
+    :return(emit):
         - isSuccess: 방 생성 성공 여부
     """
     owner = data['nickName']
@@ -121,10 +121,13 @@ def create(sid, data):
 def join(sid, data):
     """
     새로운 사람의 Room 참여 정보를 기존 Room 참여자들에게 전달
-
-    :argument:
-        - nickName: 방 참여자 닉네임
+    :param sid:
+        - SocketIO ID
+    :param data:
+        - nickName: 방 생성자 닉네임
         - roomCode: 입장하려는 방 코드
+    :return(emit):
+        - 없음
     """
     nickname = data['nickName']
     room_code = data['roomCode']
@@ -135,10 +138,13 @@ def join(sid, data):
 def offer(sid, data):
     """
     기존 참여자들의 정보를 새로운 참여자에게 전달
-
-    :argument:
+    :param sid:
+        - SocketIO ID
+    :param data:
         - roomCode: 입장하려는 방 코드
         - sdp: 참여자의 peer 정보
+    :return(emit):
+        - 없음
     """
     room_code = data['roomCode']
     sdp = data['sdp']
@@ -149,10 +155,13 @@ def offer(sid, data):
 def answer(sid, data):
     """
     새로운 참여자의 정보를 서버로 전달
-
-    :argument:
+    :param sid:
+        - SocketIO ID
+    :param data:
         - roomCode: 입장하려는 방 코드
         - sdp: 참여자의 peer 정보
+    :return(emit):
+        - 없음
     """
     room_code = data['roomCode']
     sdp = data['sdp']
