@@ -1,5 +1,4 @@
 from django.urls import path
-from rest_framework import routers
 
 from sockets.views import sio_views, room_views
 from sockets.views.room_views import RoomsAPI

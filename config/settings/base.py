@@ -34,15 +34,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    
+    "common.apps.CommonConfig",
+    "sockets.apps.SocketsConfig",
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
-    
     "socketio",
-    
-    "common.apps.CommonConfig",
-    "sockets.apps.SocketsConfig",
 ]
 
 MIDDLEWARE = [

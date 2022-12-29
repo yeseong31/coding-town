@@ -1,8 +1,6 @@
 from django.db import models
 from django.utils import timezone
 
-from common.models import MyUser as User
-
 
 class Room(models.Model):
     sid = models.CharField(max_length=128, null=True, blank=True, verbose_name='room socketio id')

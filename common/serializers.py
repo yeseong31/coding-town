@@ -8,7 +8,7 @@ from common.models import MyUser as User
 
 class RegisterSerializer(serializers.ModelSerializer):
     """회원 등록 Serializer"""
-    
+
     nickname = serializers.CharField(
         required=True,
         validators=[UniqueValidator(queryset=User.objects.all())],
@@ -22,11 +22,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False
     )
-    
+
     class Meta:
         model = User
         fields = ('nickname', 'password', 'password2',)
-    
+
     def validate(self, data):
         """
         비밀번호 일치 여부 확인
@@ -40,7 +40,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         # if data['password'] != data['password2']:
         #     raise serializers.ValidationError({'password': "Password fields didn't match."})
         return data
-    
+
     def create(self, validated_data):
         """
         CREATE 요청에 대해 create() 메서드를 overwrite 및 User/Token 생성
@@ -65,7 +65,7 @@ class SigninSerializer(serializers.Serializer):
     """회원 조회 Serializer"""
     nickname = serializers.CharField(required=True)
     password = serializers.CharField(required=False, write_only=True)
-    
+
     def validate(self, data):
         # user = authenticate(**data)
         user = User.objects.get(nickname=data['nickname'])

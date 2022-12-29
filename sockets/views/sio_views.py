@@ -91,7 +91,7 @@ def create(sid, data):
 
     owner = data['nickName']
     code = data['roomCode']
-    
+
     room = Room.objects.filter(code=code).first()
     # 존재하지 않는 Room인 경우
     if not room:
@@ -115,7 +115,7 @@ def create(sid, data):
         }
     sio.emit('create', response_data)
     print(f'[Server] {response_data}')
-        
+
 
 @sio.on('join')
 def join(sid, data):
@@ -133,7 +133,7 @@ def join(sid, data):
 
     nickname = data['nickName']
     code = data['roomCode']
-    
+
     room = Room.objects.filter(code=code).first()
     # 존재하지 않는 Room인 경우
     if not room:
@@ -173,7 +173,7 @@ def offer(sid, data):
 
     code = data['roomCode']
     sdp = data['sdp']
-    
+
     room = Room.objects.filter(code=code).first()
     # 존재하지 않는 Room인 경우
     if not room:
@@ -227,8 +227,8 @@ def answer(sid, data):
         }
     sio.emit('answer', response_data, room=code, skip_sid=sid)
     print(f'[Server] {response_data}')
-    
-    
+
+
 @sio.on('bye')
 def bye(sid, data):
     """
@@ -245,7 +245,7 @@ def bye(sid, data):
 
     code = data['roomCode']
     nickname = data['nickName']
-    
+
     room = Room.objects.filter(code=code).first()
     # 존재하지 않는 Room인 경우
     if not room:

@@ -11,11 +11,11 @@ class UserCreationForm(forms.ModelForm):
     fields, plus a repeated password."""
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
-    
+
     class Meta:
         model = MyUser
         fields = ('nickname',)
-    
+
     def clean_password2(self):
         # Check that the two password entries match
         password1 = self.cleaned_data.get("password1")
@@ -23,7 +23,7 @@ class UserCreationForm(forms.ModelForm):
         if password1 and password2 and password1 != password2:
             raise ValidationError("Passwords don't match")
         return password2
-    
+
     def save(self, commit=True):
         # Save the provided password in hashed format
         user = super().save(commit=False)
@@ -39,7 +39,7 @@ class UserChangeForm(forms.ModelForm):
     disabled password hash display field.
     """
     password = ReadOnlyPasswordHashField()
-    
+
     class Meta:
         model = MyUser
         fields = ('nickname', 'password', 'is_active', 'is_admin',)
@@ -49,7 +49,7 @@ class UserAdmin(BaseUserAdmin):
     # The forms to add and change user instances
     form = UserChangeForm
     add_form = UserCreationForm
-    
+
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
