@@ -15,7 +15,9 @@ async_mode = 'eventlet'
 sio = socketio.Server(
     async_mode=async_mode,
     cors_allowed_origins='*',
-    logger=True
+    logger=True,
+    async_handlers=True,
+    pingTimeout=900
 )
 thread = None
 
