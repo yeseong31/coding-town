@@ -114,7 +114,7 @@ def create(sid, data):
             'isSuccess': True
         }
     sio.emit('create', response_data)
-    print(f'[Server] {response_data["message"]}')
+    print(f'[Server] {response_data}')
         
 
 @sio.on('join')
@@ -130,8 +130,29 @@ def join(sid, data):
         - 없음
     """
     nickname = data['nickName']
-    room_code = data['roomCode']
-    print(nickname, room_code)
+    code = data['roomCode']
+    
+    room = Room.objects.get(code=code)
+    # 존재하지 않는 Room인 경우
+    if not room:
+        response_data = {
+            'message': "This room doesn't exist.",
+            'isSuccess': False
+        }
+    # 이미 정원이 가득 찬 방인 경우
+    elif room.current_num == room.total_num:
+        response_data = {
+            'message': "The room is already full.",
+            'isSuccess': False
+        }
+    else:
+        response_data = {
+            'message': "The room exists.",
+            'nickName': nickname,
+            'isSuccess': True
+        }
+    sio.emit('join', response_data, room=code, skip_sid=sid)
+    print(f'[Server] {response_data}')
 
 
 @sio.on('offer')
