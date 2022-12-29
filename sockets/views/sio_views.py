@@ -167,9 +167,26 @@ def offer(sid, data):
     :return(emit):
         - 없음
     """
-    room_code = data['roomCode']
+    code = data['roomCode']
     sdp = data['sdp']
-    print(room_code, sdp)
+    
+    room = Room.objects.get(code=code)
+    # 존재하지 않는 Room인 경우
+    if not room:
+        response_data = {
+            'message': "This room doesn't exist.",
+            'sdp': None,
+            'isSuccess': False
+        }
+    else:
+        response_data = {
+            'message': 'The information of the user currently in the room.',
+            'roomCode': code,
+            'sdp': sdp,
+            'isSuccess': True
+        }
+    sio.emit('offer', response_data, room=code, skip_sid=sid)
+    print(f'[Server] {response_data}')
 
 
 @sio.on('answer')
@@ -184,9 +201,61 @@ def answer(sid, data):
     :return(emit):
         - 없음
     """
-    room_code = data['roomCode']
+    code = data['roomCode']
     sdp = data['sdp']
-    print(room_code, sdp)
+
+    room = Room.objects.get(code=code)
+    # 존재하지 않는 Room인 경우
+    if not room:
+        response_data = {
+            'message': "This room doesn't exist.",
+            'sdp': None,
+            'isSuccess': False
+        }
+    else:
+        response_data = {
+            'message': 'The information of the user currently in the room.',
+            'roomCode': code,
+            'sdp': sdp,
+            'isSuccess': True
+        }
+    sio.emit('answer', response_data, room=code, skip_sid=sid)
+    print(f'[Server] {response_data}')
+    
+    
+@sio.on('bye')
+def bye(sid, data):
+    """
+    Room 퇴장 이벤트
+    :param sid:
+        - SocketIO ID
+    :param data:
+        - roomCode: 퇴장한 방 코드
+        - nickName: 퇴장한 사용자의 닉네임
+    :return:
+        - 없음
+    """
+    code = data['roomCode']
+    nickname = data['nickName']
+    
+    room = Room.objects.get(code=code)
+    # 존재하지 않는 Room인 경우
+    if not room:
+        response_data = {
+            'message': "This room doesn't exist.",
+            'isSuccess': False
+        }
+    else:
+        response_data = {
+            'message': f'[{sid}] {nickname} has left.',
+            'isSuccess': True
+        }
+        room.current_num -= 1
+        # Room에 더 이상 참여자가 없는 경우
+        if room.current_num == 0:
+            room.delete()
+    sio.emit('answer', response_data, room=code, skip_sid=sid)
+    print(f'[Server] {response_data}')
 
 
 def test(request):
