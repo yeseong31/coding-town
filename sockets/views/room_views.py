@@ -5,7 +5,6 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from common.models import MyUser as User
 from sockets.models import Room
 
 
@@ -25,23 +24,45 @@ def room_post(request):
         password = request.POST.get('password')
         owner = request.POST.get('nickName')
         
-        # 사용자가 존재하지 않으면 생성
-        user = User.objects.get(nickname=owner)
-        if not user:
-            user = User.objects.create_user(owner)
+        # Room 정보 확인
+        room = Room.objects.filter(name=name)
+        # Room 이름이 중복되는 경우
+        if len(room) > 1:
+            return Response(
+                {
+                    'message': '[Server] There is already a Room with a duplicate name.',
+                    'roomCode': -1,
+                    'isSuccess': False
+                },
+                status=status.HTTP_400_BAD_REQUEST)
+        
         # 랜덤 시드 생성
         random.seed()
-        # Room 생성
+        
+        # Room 생성 및 저장
         room = Room(
             name=name,
             code=int(random.random() * 10 ** 6),
             is_private=False if password == '' or password is None else True,
             password=bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode(),
-            owner=user,
+            owner=owner,
             current_num=1,
         )
         room.save()
-        return Response({'roomCode': room.code}, status=status.HTTP_200_OK)
+        
+        return Response(
+            {
+                'roomCode': room.code,
+                'isSuccess': True
+            },
+            status=status.HTTP_201_CREATED)
+
+    # POST 요청이 아닌 경우
     else:
-        return Response({'message': '[Server] Invalid request.'}, status=status.HTTP_400_BAD_REQUEST)
-    
+        return Response(
+            {
+                'message': '[Server] Invalid request.',
+                'roomCode': -1,
+                'isSuccess': False
+            },
+            status=status.HTTP_400_BAD_REQUEST)
