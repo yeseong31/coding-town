@@ -1,6 +1,8 @@
 import random
 
 import bcrypt
+from django.core.paginator import Paginator
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -15,11 +17,35 @@ class RoomsAPI(APIView):
         """
         Room 전체 목록 조회
         :param request:
+        - search: 검색 단어 (Room 이름, Tag 이름, Room 생성자 닉네임 등)
         :return:
+        - roomCount: 생성된 Room의 수
+        - rooms: 생성된 Room 정보 리스트
+            - roomName: Room 이름
+            - roomCode: Room 코드
+            - isPrivate: Room 암호화 여부
+            - password: Room 비밀번호 (isPrivate이 False인 경우 빈 문자열)
+            - currentUser: Room 현재 입장 인원 수
+            - totalUser: Room 입장 제한 인원 수
         """
-        rooms = Room.objects.all()
-        serializer = RoomSerializer(rooms, many=True)
+        page = request.GET.get('page', '1')
+        search = request.GET.get('search', '')
+        room_list = Room.objects.order_by('-created_at')
+
+        if search:
+            room_list = room_list.filter(
+                Q(name__icontains=search) |  # Room 이름 검색
+                Q(owner__icontains=search) |  # Room 생성자 닉네임 검색
+                Q(tags__name__icontains=search)  # Tag 이름 검색
+            ).distinct()
+
+        paginator = Paginator(room_list, 20)
+        page_obj = paginator.get_page(page)
+
+        serializer = RoomSerializer(page_obj, many=True)
         response_data = {
+            'page': page,
+            'search': search,
             'roomCount': len(serializer.data),
             'rooms': serializer.data
         }
@@ -31,11 +57,11 @@ def room_post(request):
     """
     Room 생성 후 입장 코드 반환
     :param request:
-    - roomName: 생성할 방 이름
-    - nickName: 방 생성자 닉네임
-    - password: 방 비밀번호
+    - roomName: 생성할 Room 이름
+    - nickName: Room 생성자 닉네임
+    - password: Room 비밀번호
     :return:
-    - roomCode: 생성된 방의 고유한 6자리 랜덤 번호
+    - roomCode: 생성된 Room의 고유한 6자리 랜덤 번호
     """
     if request.method == 'POST':
         name = request.POST.get('roomName')
@@ -90,13 +116,13 @@ def room_join(request):
     """
     Room 참가 가능 여부 확인
     :param request:
-    - roomName: 참가하고자 하는 방 이름
-    - roomCode: 참가하고자 하는 방 코드
+    - roomName: 참가하고자 하는 Room 이름
+    - roomCode: 참가하고자 하는 Room 코드
     - nickName: 참가자 닉네임
-    - password: 방 비밀번호 (is_private 활성 시 빈 문자열)
+    - password: Room 비밀번호 (is_private이 False인 경우 빈 문자열)
     :return:
-    - isSuccess: 참가 가능 여부 (비밀번호를 잘못 입력하거나 존재하지 않는 방이라면 False)
-    - message: 참가 불가능한 이유 (isSuccess가 True이면 빈 문자열)
+    - isSuccess: Room 참가 가능 여부 (비밀번호를 잘못 입력하거나 존재하지 않는 방이라면 False)
+    - message: Room 참가 불가능한 이유 (isSuccess가 True인 경우 빈 문자열)
     """
     if request.method == 'POST':
         name = request.POST.get('roomName')

@@ -82,10 +82,10 @@ def create(sid, data):
     :param sid:
         - SocketIO ID
     :param data:
-        - nickName: 방 생성자 닉네임
-        - roomCode: 입장하려는 방 코드
+        - nickName: Room 생성자 닉네임
+        - roomCode: Room 코드
     :return(emit):
-        - isSuccess: 방 생성 성공 여부
+        - isSuccess: Room 생성 성공 여부
     """
     from sockets.models import Room
 
@@ -99,13 +99,13 @@ def create(sid, data):
             'message': "This room doesn't exist.",
             'isSuccess': False
         }
-    # 방 생성자가 아닌 경우
+    # Room 생성자가 아닌 경우
     elif room.owner != owner:
         response_data = {
             'message': "The nickname you received is different from the nickname of the room creator.",
             'isSuccess': False
         }
-    # 방 생성
+    # Room 생성
     else:
         sio.enter_room(sid, code)
         room.current_num += 1
@@ -120,14 +120,16 @@ def create(sid, data):
 @sio.on('join')
 def join(sid, data):
     """
-    새로운 사람의 Room 참여 정보를 기존 Room 참여자들에게 전달
+    새로운 참여자의 Room 참여 정보를 기존 Room 참여자들에게 전달
     :param sid:
         - SocketIO ID
     :param data:
-        - nickName: 방 생성자 닉네임
-        - roomCode: 입장하려는 방 코드
+        - nickName: Room 생성자 닉네임
+        - roomCode: Room 코드
     :return(emit):
-        - 없음
+        - message: emit 설명
+        - isSuccess: 이벤트 수행 결과
+        - nickName: 참여자 닉네임
     """
     from sockets.models import Room
 
@@ -141,12 +143,13 @@ def join(sid, data):
             'message': "This room doesn't exist.",
             'isSuccess': False
         }
-    # 이미 정원이 가득 찬 방인 경우
+    # 이미 정원이 가득 찬 Room인 경우
     elif room.current_num == room.total_num:
         response_data = {
             'message': "The room is already full.",
             'isSuccess': False
         }
+    # Room 참여 정보 전달
     else:
         response_data = {
             'message': "The room exists.",
@@ -164,10 +167,12 @@ def offer(sid, data):
     :param sid:
         - SocketIO ID
     :param data:
-        - roomCode: 입장하려는 방 코드
-        - sdp: 참여자의 peer 정보
+        - roomCode: Room 코드
+        - sdp: 참여자 peer 정보
     :return(emit):
-        - 없음
+        - message: emit 설명
+        - sdp: 기존 참여자 peer 정보
+        - isSuccess: 이벤트 수행 결과
     """
     from sockets.models import Room
 
@@ -182,6 +187,7 @@ def offer(sid, data):
             'sdp': None,
             'isSuccess': False
         }
+    # Room에 참여자 정보 전달
     else:
         response_data = {
             'message': 'The information of the user currently in the room.',
@@ -200,10 +206,12 @@ def answer(sid, data):
     :param sid:
         - SocketIO ID
     :param data:
-        - roomCode: 입장하려는 방 코드
-        - sdp: 참여자의 peer 정보
+        - roomCode: Room 코드
+        - sdp: 참여자 peer 정보
     :return(emit):
-        - 없음
+        - message: emit 설명
+        - sdp: 참여자 peer 정보
+        - isSuccess: 이벤트 수행 결과
     """
     from sockets.models import Room
 
@@ -218,6 +226,7 @@ def answer(sid, data):
             'sdp': None,
             'isSuccess': False
         }
+    # Room에 참여자 정보 전달
     else:
         response_data = {
             'message': 'The information of the user currently in the room.',
@@ -236,10 +245,11 @@ def bye(sid, data):
     :param sid:
         - SocketIO ID
     :param data:
-        - roomCode: 퇴장한 방 코드
-        - nickName: 퇴장한 사용자의 닉네임
+        - roomCode: 퇴장한 Room 코드
+        - nickName: 퇴장한 참여자 닉네임
     :return:
-        - 없음
+        - message: emit 설명
+        - isSuccess: 이벤트 수행 결과
     """
     from sockets.models import Room
 
@@ -253,6 +263,7 @@ def bye(sid, data):
             'message': "This room doesn't exist.",
             'isSuccess': False
         }
+    # Room 퇴장
     else:
         response_data = {
             'message': f'[{sid}] {nickname} has left.',

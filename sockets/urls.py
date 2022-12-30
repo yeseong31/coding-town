@@ -14,6 +14,6 @@ urlpatterns = [
     path('room/create/', room_views.room_post, name='room_post'),
     # Room 참가
     path('room/join/', room_views.room_join, name='room_join'),
-    # Room 리스트 조회
-    path('lobby/', RoomsAPI.as_view(), name='lobby'),
+    # Room 리스트 조회 및 검색
+    path('lobby/', RoomsAPI.as_view(), name='room_search'),
 ]
