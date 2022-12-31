@@ -65,9 +65,13 @@ def room_post(request):
     """
     if request.method == 'POST':
         name = request.POST.get('roomName')
-        password = request.POST.get('password')
         owner = request.POST.get('nickName')
-
+        password = request.POST.get('password')
+        
+        # 비밀번호를 지정하지 않는 경우 공백 처리
+        if password is None:
+            password = ''
+    
         # Room 정보 확인
         room = Room.objects.filter(name=name).first()
         # Room 이름이 중복되는 경우
@@ -79,10 +83,10 @@ def room_post(request):
                     'isSuccess': False
                 },
                 status=status.HTTP_400_BAD_REQUEST)
-
+    
         # 랜덤 시드 생성
         random.seed()
-
+    
         # Room 생성 및 저장
         room = Room(
             name=name,
@@ -92,7 +96,7 @@ def room_post(request):
             owner=owner,
         )
         room.save()
-
+    
         return Response(
             {
                 'roomCode': room.code,
