@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from rest_framework import generics, status
 from rest_framework.response import Response
 
@@ -20,3 +21,7 @@ class SigninView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         token = serializer.validated_data
         return Response({'token': token.key}, status=status.HTTP_200_OK)
+
+
+def page_not_found(request, exception):
+    return render(request, '404.html', {})
