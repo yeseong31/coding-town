@@ -29,9 +29,8 @@ class RoomsAPI(APIView):
             - currentUser: Room 현재 입장 인원 수
             - totalUser: Room 입장 제한 인원 수
         """
-        request = json.loads(request.body)
-        page = request.get('page', '1')
-        search = request.get('search', '')
+        page = request.GET.get('page', '1')
+        search = request.GET.get('search', '')
         room_list = Room.objects.order_by('-created_at')
 
         if search:
