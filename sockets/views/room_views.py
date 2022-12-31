@@ -1,3 +1,4 @@
+import json
 import random
 
 import bcrypt
@@ -8,7 +9,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from sockets.models import Room
+from sockets.models import Room, Tag
 from sockets.serializers import RoomSerializer
 
 
@@ -28,8 +29,9 @@ class RoomsAPI(APIView):
             - currentUser: Room 현재 입장 인원 수
             - totalUser: Room 입장 제한 인원 수
         """
-        page = request.GET.get('page', '1')
-        search = request.GET.get('search', '')
+        request = json.loads(request.body)
+        page = request.get('page', '1')
+        search = request.get('search', '')
         room_list = Room.objects.order_by('-created_at')
 
         if search:
@@ -64,10 +66,11 @@ def room_post(request):
     - roomCode: 생성된 Room의 고유한 6자리 랜덤 번호
     """
     if request.method == 'POST':
-        name = request.POST.get('roomName')
-        owner = request.POST.get('nickName')
-        password = request.POST.get('password')
-        tags = request.POST.get('tags')
+        request = json.loads(request.body)
+        name = request.get('roomName')
+        owner = request.get('nickName')
+        password = request.get('password', '')
+        tags = request.get('tags')
         
         # 필요한 정보가 제대로 전달되지 않은 경우
         if not (name and owner):
@@ -78,10 +81,6 @@ def room_post(request):
                     'isSuccess': False
                 },
                 status=status.HTTP_400_BAD_REQUEST)
-        
-        # 비밀번호 값이 전달되지 않은 경우
-        if not password:
-            password = ''
     
         # Room 정보 확인
         room = Room.objects.filter(name=name).first()
@@ -107,12 +106,20 @@ def room_post(request):
             owner=owner,
         )
         room.save()
+        
+        # Tag 생성 및 저장
+        for tag_name in tags:
+            tag = Tag.objects.filter(name=tag_name, slug=tag_name).first()
+            if not tag:
+                tag = Tag(name=tag_name, slug=tag_name)
+                tag.save()
+            room.tags.add(tag)
+        room.save()
     
         return Response(
             {
                 'roomCode': room.code,
-                'isSuccess': True,
-                'tags': tags
+                'isSuccess': True
             },
             status=status.HTTP_201_CREATED)
 
@@ -141,10 +148,11 @@ def room_join(request):
     - message: Room 참가 불가능한 이유 (isSuccess가 True인 경우 빈 문자열)
     """
     if request.method == 'POST':
-        name = request.POST.get('roomName')
-        code = request.POST.get('roomCode')
-        nickname = request.POST.get('nickName')
-        password = request.POST.get('password')
+        request = json.loads(request.body)
+        name = request.get('roomName')
+        code = request.get('roomCode')
+        nickname = request.get('nickName')
+        password = request.get('password', '')
         
         # 필요한 정보가 제대로 전달되지 않은 경우
         if not (name and code and nickname and password):
