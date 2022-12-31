@@ -70,7 +70,7 @@ def room_post(request):
         tags = request.POST.get('tags')
         
         # 필요한 정보가 제대로 전달되지 않은 경우
-        if not (name and owner and password and tags):
+        if not (name and owner):
             return Response(
                 {
                     'message': '[Server] The required information was not delivered properly. ',
@@ -78,6 +78,10 @@ def room_post(request):
                     'isSuccess': False
                 },
                 status=status.HTTP_400_BAD_REQUEST)
+        
+        # 비밀번호 값이 전달되지 않은 경우
+        if not password:
+            password = ''
     
         # Room 정보 확인
         room = Room.objects.filter(name=name).first()
@@ -98,7 +102,7 @@ def room_post(request):
         room = Room(
             name=name,
             code=int(random.random() * 10 ** 6),
-            is_private=False if password == '' or password is None else True,
+            is_private=False if password == '' else True,
             password=bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode(),
             owner=owner,
         )
@@ -107,7 +111,8 @@ def room_post(request):
         return Response(
             {
                 'roomCode': room.code,
-                'isSuccess': True
+                'isSuccess': True,
+                'tags': tags
             },
             status=status.HTTP_201_CREATED)
 
