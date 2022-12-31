@@ -67,10 +67,17 @@ def room_post(request):
         name = request.POST.get('roomName')
         owner = request.POST.get('nickName')
         password = request.POST.get('password')
+        tags = request.POST.get('tags')
         
-        # 비밀번호를 지정하지 않는 경우 공백 처리
-        if password is None:
-            password = ''
+        # 필요한 정보가 제대로 전달되지 않은 경우
+        if not (name and owner and password and tags):
+            return Response(
+                {
+                    'message': '[Server] The required information was not delivered properly. ',
+                    'roomCode': -1,
+                    'isSuccess': False
+                },
+                status=status.HTTP_400_BAD_REQUEST)
     
         # Room 정보 확인
         room = Room.objects.filter(name=name).first()
@@ -133,6 +140,16 @@ def room_join(request):
         code = request.POST.get('roomCode')
         nickname = request.POST.get('nickName')
         password = request.POST.get('password')
+        
+        # 필요한 정보가 제대로 전달되지 않은 경우
+        if not (name and code and nickname and password):
+            return Response(
+                {
+                    'message': '[Server] The required information was not delivered properly. ',
+                    'roomCode': -1,
+                    'isSuccess': False
+                },
+                status=status.HTTP_400_BAD_REQUEST)
 
         # Room 정보 확인
         room = Room.objects.get(name=name, code=code)
