@@ -35,14 +35,14 @@ def background_thread():
     while True:
         sio.sleep(10)
         count += 1
-        sio.emit('my_response', {'data': 'Server generated event'}, namespace='/test')
+        sio.emit('my_response', {'data': '[Server] Server generated event'}, namespace='/test')
 
 
 @sio.event
 def connect(sid, environ):
     """Socket Connect 이벤트 감지"""
     print(f'[{sid}] Client connected')
-    sio.emit('my_response', {'data': 'Connected', 'count': 0})
+    sio.emit('my_response', {'data': '[Server] Connected', 'count': 0})
 
 
 @sio.event
@@ -54,25 +54,25 @@ def disconnect_request(sid):
 def disconnect(sid):
     """Socket Disconnect 이벤트 감지"""
     print(f'[{sid}] Client disconnected')
-    sio.emit('my_response', {'data': 'Disconnected'})
+    sio.emit('my_response', {'data': '[Server] Disconnected'})
 
 
-@sio.event
-def message(sid, msg):
-    """Socket 메시지 송수신 이벤트 감지"""
-    if msg == 'New Connect!':
-        to_client['message'] = 'welcome!'
-        to_client['type'] = 'connect'
-        sio.emit('status', {'msg': 'connect'})
-    elif msg == 'Disconnect':
-        to_client['message'] = 'bye bye'
-        to_client['type'] = 'disconnect'
-        sio.emit('status', {'msg': 'disconnect'})
-    else:
-        to_client['message'] = msg
-        to_client['type'] = 'normal'
-        sio.emit('status', {'msg': f'message: {msg}'})
-    sio.send(to_client, broadcast=True)
+# @sio.event
+# def message(sid, msg):
+#     """Socket 메시지 송수신 이벤트 감지"""
+#     if msg == 'New Connect!':
+#         to_client['message'] = 'welcome!'
+#         to_client['type'] = 'connect'
+#         sio.emit('status', {'msg': 'connect'})
+#     elif msg == 'Disconnect':
+#         to_client['message'] = 'bye bye'
+#         to_client['type'] = 'disconnect'
+#         sio.emit('status', {'msg': 'disconnect'})
+#     else:
+#         to_client['message'] = msg
+#         to_client['type'] = 'normal'
+#         sio.emit('status', {'msg': f'message: {msg}'})
+#     sio.send(to_client, broadcast=True)
 
 
 @sio.on('create')
@@ -92,7 +92,7 @@ def create(sid, data):
 
     sio.enter_room(sid, code)
     response_data = {
-        'message': f"{owner} has entered the room.",
+        'message': f"[Server] {owner} has entered the room.",
         'isSuccess': True
     }
 
@@ -119,7 +119,7 @@ def join(sid, data):
     code = data['roomCode']
 
     response_data = {
-        'message': "The room exists.",
+        'message': "[Server] The room exists.",
         'nickName': nickname,
     }
 
@@ -146,7 +146,7 @@ def offer(sid, data):
     sdp = data['sdp']
 
     response_data = {
-        'message': 'The information of the user currently in the room.',
+        'message': '[Server] The information of the user currently in the room.',
         'roomCode': code,
         'sdp': sdp,
         'isSuccess': True
@@ -175,7 +175,7 @@ def answer(sid, data):
     sdp = data['sdp']
 
     response_data = {
-        'message': 'The information of the user currently in the room.',
+        'message': '[Server] The information of the user currently in the room.',
         'roomCode': code,
         'sdp': sdp,
         'isSuccess': True
@@ -203,7 +203,7 @@ def bye(sid, data):
     nickname = data['nickName']
 
     response_data = {
-        'message': f'[{sid}] {nickname} has left.',
+        'message': f'[Server] <<{sid}>> {nickname} has left.',
         'isSuccess': True
     }
 
