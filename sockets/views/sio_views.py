@@ -234,9 +234,9 @@ def icecandidate(sid, data):
     }
 
     if sid == target:
-        sio.emit('candidate', response_data, room=code)
+        sio.emit('icecandidate', response_data, room=code)
     else:
-        sio.emit('candidate', response_data, to=target)
+        sio.emit('icecandidate', response_data, to=target)
     # print(f'[Server] IceCandidate: {response_data}')
 
 
