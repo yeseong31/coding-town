@@ -57,22 +57,22 @@ def disconnect(sid):
     sio.emit('disconnect', {'data': '[Server] Disconnected'})
 
 
-# @sio.event
-# def message(sid, msg):
-#     """Socket 메시지 송수신 이벤트 감지"""
-#     if msg == 'New Connect!':
-#         to_client['message'] = 'welcome!'
-#         to_client['type'] = 'connect'
-#         sio.emit('status', {'msg': 'connect'})
-#     elif msg == 'Disconnect':
-#         to_client['message'] = 'bye bye'
-#         to_client['type'] = 'disconnect'
-#         sio.emit('status', {'msg': 'disconnect'})
-#     else:
-#         to_client['message'] = msg
-#         to_client['type'] = 'normal'
-#         sio.emit('status', {'msg': f'message: {msg}'})
-#     sio.send(to_client, broadcast=True)
+@sio.event
+def message(sid, msg):
+    """Socket 메시지 송수신 이벤트 감지"""
+    if msg == 'New Connect!':
+        to_client['message'] = 'welcome!'
+        to_client['type'] = 'connect'
+        sio.emit('status', {'msg': 'connect'})
+    elif msg == 'Disconnect':
+        to_client['message'] = 'bye bye'
+        to_client['type'] = 'disconnect'
+        sio.emit('status', {'msg': 'disconnect'})
+    else:
+        to_client['message'] = msg
+        to_client['type'] = 'normal'
+        sio.emit('status', {'msg': f'message: {msg}'})
+    sio.send(to_client, broadcast=True)
 
 
 @sio.on('create')
@@ -85,6 +85,7 @@ def create(sid, data):
         - nickName: Room 생성자 닉네임
         - roomCode: Room 코드
     :return(emit):
+        - message: emit 설명
         - isSuccess: Room 생성 성공 여부
     """
     owner = data['nickName']
@@ -97,8 +98,7 @@ def create(sid, data):
     }
 
     sio.emit('create', response_data, room=code)
-    sio.send(response_data)
-    print(f'[Server] {response_data}')
+    print(f'[Server] Create: {response_data}')
 
 
 @sio.on('join')
@@ -125,8 +125,7 @@ def join(sid, data):
     }
 
     sio.emit('join', response_data, room=code, skip_sid=sid)
-    sio.send(response_data)
-    print(f'[Server] {response_data}')
+    print(f'[Server] Join: {response_data}')
 
 
 @sio.on('offer')
@@ -155,8 +154,7 @@ def offer(sid, data):
     }
 
     sio.emit('offer', response_data, to=target)
-    sio.send(response_data)
-    print(f'[Server] {response_data}')
+    print(f'[Server] Offer: {response_data}')
 
 
 @sio.on('answer')
@@ -184,8 +182,7 @@ def answer(sid, data):
     }
 
     sio.emit('answer', response_data, room=code, skip_sid=sid)
-    sio.send(response_data)
-    print(f'[Server] {response_data}')
+    print(f'[Server] Answer: {response_data}')
 
 
 @sio.on('bye')
@@ -210,8 +207,7 @@ def bye(sid, data):
     }
 
     sio.emit('answer', response_data, room=code, skip_sid=sid)
-    sio.send(response_data)
-    print(f'[Server] {response_data}')
+    print(f'[Server] Bye: {response_data}')
 
 
 def test(request):
