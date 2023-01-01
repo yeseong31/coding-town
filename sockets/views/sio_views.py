@@ -87,33 +87,17 @@ def create(sid, data):
     :return(emit):
         - isSuccess: Room 생성 성공 여부
     """
-    from sockets.models import Room
-
     owner = data['nickName']
     code = data['roomCode']
 
-    room = Room.objects.filter(code=code).first()
-    # 존재하지 않는 Room인 경우
-    if not room:
-        response_data = {
-            'message': "This room doesn't exist.",
-            'isSuccess': False
-        }
-    # Room 생성자가 아닌 경우
-    elif room.owner != owner:
-        response_data = {
-            'message': "The nickname you received is different from the nickname of the room creator.",
-            'isSuccess': False
-        }
-    # Room 생성
-    else:
-        sio.enter_room(sid, code)
-        room.current_num += 1
-        response_data = {
-            'message': f"{owner} has entered the room.",
-            'isSuccess': True
-        }
-    sio.emit('create', response_data)
+    sio.enter_room(sid, code)
+    response_data = {
+        'message': f"{owner} has entered the room.",
+        'isSuccess': True
+    }
+
+    sio.emit('create', response_data, room=code)
+    sio.send(response_data)
     print(f'[Server] {response_data}')
 
 
@@ -131,32 +115,16 @@ def join(sid, data):
         - isSuccess: 이벤트 수행 결과
         - nickName: 참여자 닉네임
     """
-    from sockets.models import Room
-
     nickname = data['nickName']
     code = data['roomCode']
 
-    room = Room.objects.filter(code=code).first()
-    # 존재하지 않는 Room인 경우
-    if not room:
-        response_data = {
-            'message': "This room doesn't exist.",
-            'isSuccess': False
-        }
-    # 이미 정원이 가득 찬 Room인 경우
-    elif room.current_num == room.total_num:
-        response_data = {
-            'message': "The room is already full.",
-            'isSuccess': False
-        }
-    # Room 참여 정보 전달
-    else:
-        response_data = {
-            'message': "The room exists.",
-            'nickName': nickname,
-            'isSuccess': True
-        }
+    response_data = {
+        'message': "The room exists.",
+        'nickName': nickname,
+    }
+
     sio.emit('join', response_data, room=code, skip_sid=sid)
+    sio.send(response_data)
     print(f'[Server] {response_data}')
 
 
@@ -174,28 +142,18 @@ def offer(sid, data):
         - sdp: 기존 참여자 peer 정보
         - isSuccess: 이벤트 수행 결과
     """
-    from sockets.models import Room
-
     code = data['roomCode']
     sdp = data['sdp']
 
-    room = Room.objects.filter(code=code).first()
-    # 존재하지 않는 Room인 경우
-    if not room:
-        response_data = {
-            'message': "This room doesn't exist.",
-            'sdp': None,
-            'isSuccess': False
-        }
-    # Room에 참여자 정보 전달
-    else:
-        response_data = {
-            'message': 'The information of the user currently in the room.',
-            'roomCode': code,
-            'sdp': sdp,
-            'isSuccess': True
-        }
+    response_data = {
+        'message': 'The information of the user currently in the room.',
+        'roomCode': code,
+        'sdp': sdp,
+        'isSuccess': True
+    }
+
     sio.emit('offer', response_data, room=code, skip_sid=sid)
+    sio.send(response_data)
     print(f'[Server] {response_data}')
 
 
@@ -213,28 +171,18 @@ def answer(sid, data):
         - sdp: 참여자 peer 정보
         - isSuccess: 이벤트 수행 결과
     """
-    from sockets.models import Room
-
     code = data['roomCode']
     sdp = data['sdp']
 
-    room = Room.objects.filter(code=code).first()
-    # 존재하지 않는 Room인 경우
-    if not room:
-        response_data = {
-            'message': "This room doesn't exist.",
-            'sdp': None,
-            'isSuccess': False
-        }
-    # Room에 참여자 정보 전달
-    else:
-        response_data = {
-            'message': 'The information of the user currently in the room.',
-            'roomCode': code,
-            'sdp': sdp,
-            'isSuccess': True
-        }
+    response_data = {
+        'message': 'The information of the user currently in the room.',
+        'roomCode': code,
+        'sdp': sdp,
+        'isSuccess': True
+    }
+
     sio.emit('answer', response_data, room=code, skip_sid=sid)
+    sio.send(response_data)
     print(f'[Server] {response_data}')
 
 
@@ -251,29 +199,16 @@ def bye(sid, data):
         - message: emit 설명
         - isSuccess: 이벤트 수행 결과
     """
-    from sockets.models import Room
-
     code = data['roomCode']
     nickname = data['nickName']
 
-    room = Room.objects.filter(code=code).first()
-    # 존재하지 않는 Room인 경우
-    if not room:
-        response_data = {
-            'message': "This room doesn't exist.",
-            'isSuccess': False
-        }
-    # Room 퇴장
-    else:
-        response_data = {
-            'message': f'[{sid}] {nickname} has left.',
-            'isSuccess': True
-        }
-        room.current_num -= 1
-        # Room에 더 이상 참여자가 없는 경우
-        if room.current_num == 0:
-            room.delete()
+    response_data = {
+        'message': f'[{sid}] {nickname} has left.',
+        'isSuccess': True
+    }
+
     sio.emit('answer', response_data, room=code, skip_sid=sid)
+    sio.send(response_data)
     print(f'[Server] {response_data}')
 
 
