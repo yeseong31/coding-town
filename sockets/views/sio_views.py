@@ -98,7 +98,7 @@ def create(sid, data):
     }
 
     sio.emit('create', response_data, room=code)
-    print(f'[Server] Create: {response_data}')
+    # print(f'[Server] Create: {response_data}')
 
 
 @sio.on('join')
@@ -125,7 +125,7 @@ def join(sid, data):
     }
 
     sio.emit('join', response_data, room=code, skip_sid=sid)
-    print(f'[Server] Join: {response_data}')
+    # print(f'[Server] Join: {response_data}')
 
 
 @sio.on('offer')
@@ -155,7 +155,7 @@ def offer(sid, data):
     }
 
     sio.emit('offer', response_data, to=target)
-    print(f'[Server] Offer: {response_data}')
+    # print(f'[Server] Offer: {response_data}')
 
 
 @sio.on('answer')
@@ -184,7 +184,7 @@ def answer(sid, data):
     }
 
     sio.emit('answer', response_data, room=code, skip_sid=sid)
-    print(f'[Server] Answer: {response_data}')
+    # print(f'[Server] Answer: {response_data}')
 
 
 @sio.on('bye')
@@ -209,7 +209,7 @@ def bye(sid, data):
     }
 
     sio.emit('bye', response_data, room=code, skip_sid=sid)
-    print(f'[Server] Bye: {response_data}')
+    # print(f'[Server] Bye: {response_data}')
 
 
 @sio.on('icecandidate')
@@ -237,7 +237,7 @@ def icecandidate(sid, data):
         sio.emit('candidate', response_data, room=code)
     else:
         sio.emit('candidate', response_data, to=target)
-    print(f'[Server] IceCandidate: {response_data}')
+    # print(f'[Server] IceCandidate: {response_data}')
 
 
 def test(request):
