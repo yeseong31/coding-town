@@ -42,7 +42,7 @@ def background_thread():
 def connect(sid, environ):
     """Socket Connect 이벤트 감지"""
     print(f'[{sid}] Client connected')
-    sio.emit('my_response', {'data': '[Server] Connected', 'count': 0})
+    sio.emit('connect', {'data': '[Server] Connected'})
 
 
 @sio.event
@@ -54,7 +54,7 @@ def disconnect_request(sid):
 def disconnect(sid):
     """Socket Disconnect 이벤트 감지"""
     print(f'[{sid}] Client disconnected')
-    sio.emit('my_response', {'data': '[Server] Disconnected'})
+    sio.emit('disconnect', {'data': '[Server] Disconnected'})
 
 
 # @sio.event
@@ -121,6 +121,7 @@ def join(sid, data):
     response_data = {
         'message': "[Server] The room exists.",
         'nickName': nickname,
+        'sid': sid
     }
 
     sio.emit('join', response_data, room=code, skip_sid=sid)
@@ -144,6 +145,7 @@ def offer(sid, data):
     """
     code = data['roomCode']
     sdp = data['sdp']
+    target = data['sid']
 
     response_data = {
         'message': '[Server] The information of the user currently in the room.',
@@ -152,7 +154,7 @@ def offer(sid, data):
         'isSuccess': True
     }
 
-    sio.emit('offer', response_data, room=code, skip_sid=sid)
+    sio.emit('offer', response_data, to=target)
     sio.send(response_data)
     print(f'[Server] {response_data}')
 
