@@ -154,7 +154,7 @@ def room_join(request):
         password = request.get('password', '')
         
         # 필요한 정보가 제대로 전달되지 않은 경우
-        if not (name and code and nickname and password):
+        if not (name and code and nickname):
             return Response(
                 {
                     'message': '[Server] The required information was not delivered properly. ',
