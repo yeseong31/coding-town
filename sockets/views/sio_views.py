@@ -112,8 +112,8 @@ def join(sid, data):
         - roomCode: Room 코드
     :return(emit):
         - message: emit 설명
-        - isSuccess: 이벤트 수행 결과
         - nickName: 참여자 닉네임
+        -sid: SocketIO ID
     """
     nickname = data['nickName']
     code = data['roomCode']
@@ -139,6 +139,7 @@ def offer(sid, data):
         - sdp: 참여자 peer 정보
     :return(emit):
         - message: emit 설명
+        - roomCode: Room 코드
         - sdp: 기존 참여자 peer 정보
         - isSuccess: 이벤트 수행 결과
     """
@@ -168,6 +169,7 @@ def answer(sid, data):
         - sdp: 참여자 peer 정보
     :return(emit):
         - message: emit 설명
+        - roomCode: Room 코드
         - sdp: 참여자 peer 정보
         - isSuccess: 이벤트 수행 결과
     """
@@ -206,8 +208,36 @@ def bye(sid, data):
         'isSuccess': True
     }
 
-    sio.emit('answer', response_data, room=code, skip_sid=sid)
+    sio.emit('bye', response_data, room=code, skip_sid=sid)
     print(f'[Server] Bye: {response_data}')
+
+
+@sio.on('icecandidate')
+def icecandidate(sid, data):
+    """
+    IceCandidate 이벤트
+    :param sid:
+        - SocketIO ID
+    :param data:
+        - sid: SocketIO ID(새로운 참여자)
+        - roomCode: Room 코드
+        - candidate: IceCandidate 객체
+    :return:
+        - candidate: IceCandidate 객체
+    """
+    target = data['sid']
+    code = data['roomCode']
+    candidate = data['candidate']
+
+    response_data = {
+        'candidate': candidate
+    }
+
+    if sid == target:
+        sio.emit('candidate', response_data, room=code)
+    else:
+        sio.emit('candidate', response_data, to=target)
+    print(f'[Server] IceCandidate: {response_data}')
 
 
 def test(request):
