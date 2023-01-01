@@ -170,6 +170,7 @@ def room_join(request):
             return Response(
                 {
                     'message': "[Server] This room doesn't exist.",
+                    'roomCode': -1,
                     'isSuccess': False
                 },
                 status=status.HTTP_400_BAD_REQUEST)
@@ -178,6 +179,7 @@ def room_join(request):
             return Response(
                 {
                     'message': "[Server] The room with the password set. Please enter your password.",
+                    'roomCode': -1,
                     'isSuccess': False
                 },
                 status=status.HTTP_400_BAD_REQUEST)
@@ -186,6 +188,7 @@ def room_join(request):
             return Response(
                 {
                     'message': "[Server] Invalid password entered.",
+                    'roomCode': -1,
                     'isSuccess': False
                 },
                 status=status.HTTP_401_UNAUTHORIZED)
@@ -194,6 +197,7 @@ def room_join(request):
             return Response(
                 {
                     'message': f"[Server] {nickname} can participate in the room.",
+                    'roomCode': code,
                     'isSuccess': True
                 },
                 status=status.HTTP_202_ACCEPTED)
@@ -203,6 +207,7 @@ def room_join(request):
         return Response(
             {
                 'message': '[Server] Invalid request.',
+                'roomCode': -1,
                 'isSuccess': False
             },
             status=status.HTTP_400_BAD_REQUEST)
