@@ -175,6 +175,7 @@ def answer(sid, data):
     """
     code = data['roomCode']
     sdp = data['sdp']
+    target = data['sid']
 
     response_data = {
         'message': '[Server] The information of the user currently in the room.',
@@ -183,7 +184,7 @@ def answer(sid, data):
         'isSuccess': True
     }
 
-    sio.emit('answer', response_data, room=code, skip_sid=sid)
+    sio.emit('answer', response_data, to=target,  skip_sid=sid)
 
 
 @sio.on('bye')
