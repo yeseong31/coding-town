@@ -130,6 +130,33 @@ def join(sid, data):
     }
 
     sio.emit('join', response_data, room=code, skip_sid=sid)
+    
+    
+@sio.on('handshake')
+def handshake(sid, data):
+    """
+    WebRTC의 offer, answer 이벤트 전에 실행되는 SocketIO Handshake
+    :param sid:
+        - SocketIO ID
+    :param data:
+        - roomCode: Room 코드
+        - sid: SocketIO ID (새로운 참여자)
+    :return(emit):
+        - message: emit 설명
+        - sid: SocketIO ID
+    """
+    target = data['sid']
+    code = data['roomCode']
+
+    response_data = {
+        'message': "[Server] SocketIO handshake event.",
+        'sid': sid
+    }
+    
+    if sid == target:
+        sio.emit('handshake', response_data, room=code)
+    else:
+        sio.emit('handshake', response_data, to=target)
 
 
 @sio.on('offer')
