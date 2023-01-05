@@ -39,7 +39,7 @@ def background_thread():
 
 
 @sio.event
-def connect(sid):
+def connect(sid, environ):
     """
     Socket Connect 이벤트 감지
     :param sid:
