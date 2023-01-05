@@ -87,6 +87,7 @@ def create(sid, data):
     :return(emit):
         - message: emit 설명
         - isSuccess: Room 생성 성공 여부
+        - sid: SocketIO ID
     """
     owner = data['nickName']
     code = data['roomCode']
@@ -94,7 +95,8 @@ def create(sid, data):
     sio.enter_room(sid, code)
     response_data = {
         'message': f"[Server] {owner} has entered the room.",
-        'isSuccess': True
+        'isSuccess': True,
+        'sid': sid
     }
 
     sio.emit('create', response_data, room=code)
@@ -112,7 +114,7 @@ def join(sid, data):
     :return(emit):
         - message: emit 설명
         - nickName: 참여자 닉네임
-        -sid: SocketIO ID
+        - sid: SocketIO ID
     """
     nickname = data['nickName']
     code = data['roomCode']
