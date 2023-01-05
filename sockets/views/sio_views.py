@@ -39,22 +39,28 @@ def background_thread():
 
 
 @sio.event
-def connect(sid, environ):
-    """Socket Connect 이벤트 감지"""
-    print(f'[{sid}] Client connected')
-    sio.emit('connect', {'data': '[Server] Connected'})
-
-
-@sio.event
-def disconnect_request(sid):
-    sio.disconnect(sid)
+def connect(sid):
+    """
+    Socket Connect 이벤트 감지
+    :param sid:
+        - SocketIO ID
+    :return(emit):
+        - message: emit 설명
+        - sid: SocketIO ID
+    """
+    sio.emit('connect', {'message': '[Server] Connected', 'sid': sid})
 
 
 @sio.event
 def disconnect(sid):
-    """Socket Disconnect 이벤트 감지"""
-    print(f'[{sid}] Client disconnected')
-    sio.emit('disconnect', {'data': '[Server] Disconnected'})
+    """
+    Socket Disconnect 이벤트 감지
+    :param sid:
+        - SocketIO ID
+    :return(emit):
+        - message: emit 설명
+    """
+    sio.emit('disconnect', {'message': '[Server] Disconnected'})
 
 
 @sio.event
@@ -87,7 +93,6 @@ def create(sid, data):
     :return(emit):
         - message: emit 설명
         - isSuccess: Room 생성 성공 여부
-        - sid: SocketIO ID
     """
     owner = data['nickName']
     code = data['roomCode']
@@ -95,8 +100,7 @@ def create(sid, data):
     sio.enter_room(sid, code)
     response_data = {
         'message': f"[Server] {owner} has entered the room.",
-        'isSuccess': True,
-        'sid': sid
+        'isSuccess': True
     }
 
     sio.emit('create', response_data, room=code)
