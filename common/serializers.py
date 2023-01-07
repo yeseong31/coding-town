@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
@@ -37,8 +38,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         :returns:
         - data: 전달된 password와 password2 정보
         """
-        # if data['password'] != data['password2']:
-        #     raise serializers.ValidationError({'password': "Password fields didn't match."})
+        if data['password'] != data['password2']:
+            raise serializers.ValidationError({'password': "Password fields didn't match."})
         return data
 
     def create(self, validated_data):
@@ -53,22 +54,21 @@ class RegisterSerializer(serializers.ModelSerializer):
         """
         user = User.objects.create_user(
             nickname=validated_data['nickname'],
-            # password=validated_data['password'],
+            password=validated_data['password'],
         )
-        # user.set_password(validated_data['password'])
+        user.set_password(validated_data['password'])
         user.save()
         Token.objects.create(user=user)
         return user
 
 
-class SigninSerializer(serializers.Serializer):
+class LoginSerializer(serializers.Serializer):
     """회원 조회 Serializer"""
     nickname = serializers.CharField(required=True)
     password = serializers.CharField(required=False, write_only=True)
 
     def validate(self, data):
-        # user = authenticate(**data)
-        user = User.objects.get(nickname=data['nickname'])
+        user = authenticate(**data)
         if user:
             return Token.objects.get(user=user)
         raise serializers.ValidationError({'error': 'Unable to sign in with provided credentials.'})

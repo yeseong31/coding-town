@@ -3,18 +3,22 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 
 from common.models import MyUser as User
-from common.serializers import RegisterSerializer, SigninSerializer
+from common.serializers import RegisterSerializer, LoginSerializer
 
 
 class RegisterView(generics.CreateAPIView):
-    """사용자 등록: POST"""
+    """
+    사용자 등록(회원가입)
+    """
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
 
 
-class SigninView(generics.GenericAPIView):
-    """사용자 조회 및 로그인: POST"""
-    serializer_class = SigninSerializer
+class LoginView(generics.GenericAPIView):
+    """
+    사용자 조회 및 로그인
+    """
+    serializer_class = LoginSerializer
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
