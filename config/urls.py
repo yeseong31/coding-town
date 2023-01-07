@@ -38,6 +38,7 @@ urlpatterns = [
     path('accounts/', include('common.urls')),
     path('', include('sockets.urls')),
 ]
+
 urlpatterns += [
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
@@ -45,3 +46,7 @@ urlpatterns += [
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+handler400 = 'common.views.handler_views.bad_request_page'
+handler404 = 'common.views.handler_views.page_not_found_page'
+handler500 = 'common.views.handler_views.server_error_page'
