@@ -4,12 +4,13 @@ import random
 import bcrypt
 from django.core.paginator import Paginator
 from django.db.models import Q
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from sockets.models import Room, Tag
-from sockets.serializers import RoomSerializer
+from sockets.serializers import RoomsSerializer, CreateRoomSerializer
 
 
 class RoomsAPI(APIView):
@@ -44,7 +45,7 @@ class RoomsAPI(APIView):
         paginator = Paginator(room_list, 20)
         page_obj = paginator.get_page(page)
 
-        serializer = RoomSerializer(page_obj, many=True)
+        serializer = RoomsSerializer(page_obj, many=True)
         response_data = {
             'page': page,
             'search': search,
@@ -55,6 +56,14 @@ class RoomsAPI(APIView):
 
 
 class CreateRoomAPI(APIView):
+    @swagger_auto_schema(
+        request_body=CreateRoomSerializer,
+        responses={
+            201: 'Created',
+            400: 'Bed Request',
+            500: 'Internal Server Error'
+        }
+    )
     def post(self, request):
         """
         Room 생성 후 입장 코드 반환
@@ -109,13 +118,14 @@ class CreateRoomAPI(APIView):
         room.save()
         
         # Tag 생성 및 저장
-        for tag_name in tags:
-            tag = Tag.objects.filter(name=tag_name, slug=tag_name).first()
-            if not tag:
-                tag = Tag(name=tag_name, slug=tag_name)
-                tag.save()
-            room.tags.add(tag)
-        room.save()
+        if tags:
+            for tag_name in tags:
+                tag = Tag.objects.filter(name=tag_name, slug=tag_name).first()
+                if not tag:
+                    tag = Tag(name=tag_name, slug=tag_name)
+                    tag.save()
+                room.tags.add(tag)
+            room.save()
     
         return Response(
             {
