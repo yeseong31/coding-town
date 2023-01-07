@@ -4,6 +4,7 @@ import random
 import bcrypt
 from django.core.paginator import Paginator
 from django.db.models import Q
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
@@ -14,12 +15,28 @@ from sockets.serializers import RoomsSerializer, CreateRoomSerializer
 
 
 class RoomsAPI(APIView):
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                'search',
+                openapi.IN_QUERY,
+                description='검색어',
+                default='',
+                type=openapi.TYPE_STRING,
+                required=False)
+        ],
+        responses={
+            200: 'OK',
+            400: 'Bad Request',
+            500: 'Internal Server Error'
+        }
+    )
     def get(self, request):
         """
         Room 전체 목록 조회
         
         :param request:
-        - search: 검색 단어 (Room 이름, Tag 이름, Room 생성자 닉네임 등)
+        - search: 검색어 (Room 이름, Tag 이름, Room 생성자 닉네임 등)
         
         :return:
         - roomCount: 생성된 Room의 수
@@ -34,17 +51,17 @@ class RoomsAPI(APIView):
         page = request.GET.get('page', '1')
         search = request.GET.get('search', '')
         room_list = Room.objects.order_by('-created_at')
-
+        
         if search:
             room_list = room_list.filter(
                 Q(name__icontains=search) |  # Room 이름 검색
                 Q(owner__icontains=search) |  # Room 생성자 닉네임 검색
                 Q(tags__name__icontains=search)  # Tag 이름 검색
             ).distinct()
-
+        
         paginator = Paginator(room_list, 20)
         page_obj = paginator.get_page(page)
-
+        
         serializer = RoomsSerializer(page_obj, many=True)
         response_data = {
             'page': page,
@@ -91,7 +108,7 @@ class CreateRoomAPI(APIView):
                     'isSuccess': False
                 },
                 status=status.HTTP_400_BAD_REQUEST)
-    
+        
         # Room 정보 확인
         room = Room.objects.filter(name=name).first()
         # Room 이름이 중복되는 경우
@@ -103,10 +120,10 @@ class CreateRoomAPI(APIView):
                     'isSuccess': False
                 },
                 status=status.HTTP_400_BAD_REQUEST)
-    
+        
         # 랜덤 시드 생성
         random.seed()
-    
+        
         # Room 생성 및 저장
         room = Room(
             name=name,
@@ -126,7 +143,7 @@ class CreateRoomAPI(APIView):
                     tag.save()
                 room.tags.add(tag)
             room.save()
-    
+        
         return Response(
             {
                 'roomCode': room.code,
@@ -165,7 +182,7 @@ class JoinRoomAPI(APIView):
                     'isSuccess': False
                 },
                 status=status.HTTP_400_BAD_REQUEST)
-
+        
         # Room 정보 확인
         room = Room.objects.get(name=name, code=code)
         # 존재하지 않는 Room인 경우
