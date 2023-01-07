@@ -5,7 +5,6 @@ import bcrypt
 from django.core.paginator import Paginator
 from django.db.models import Q
 from rest_framework import status
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -17,8 +16,10 @@ class RoomsAPI(APIView):
     def get(self, request):
         """
         Room 전체 목록 조회
+        
         :param request:
         - search: 검색 단어 (Room 이름, Tag 이름, Room 생성자 닉네임 등)
+        
         :return:
         - roomCount: 생성된 Room의 수
         - rooms: 생성된 Room 정보 리스트
@@ -53,18 +54,19 @@ class RoomsAPI(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-@api_view(('POST',))
-def room_post(request):
-    """
-    Room 생성 후 입장 코드 반환
-    :param request:
-    - roomName: 생성할 Room 이름
-    - nickName: Room 생성자 닉네임
-    - password: Room 비밀번호
-    :return:
-    - roomCode: 생성된 Room의 고유한 6자리 랜덤 번호
-    """
-    if request.method == 'POST':
+class CreateRoomAPI(APIView):
+    def post(self, request):
+        """
+        Room 생성 후 입장 코드 반환
+        
+        :param request:
+        - roomName: 생성할 Room 이름
+        - nickName: Room 생성자 닉네임
+        - password: Room 비밀번호
+        
+        :return:
+        - roomCode: 생성된 Room의 고유한 6자리 랜덤 번호
+        """
         request = json.loads(request.body)
         name = request.get('roomName')
         owner = request.get('nickName')
@@ -122,31 +124,22 @@ def room_post(request):
             },
             status=status.HTTP_201_CREATED)
 
-    # POST 요청이 아닌 경우
-    else:
-        return Response(
-            {
-                'message': '[Server] Invalid request.',
-                'roomCode': -1,
-                'isSuccess': False
-            },
-            status=status.HTTP_400_BAD_REQUEST)
 
-
-@api_view(('POST',))
-def room_join(request):
-    """
-    Room 참가 가능 여부 확인
-    :param request:
-    - roomName: 참가하고자 하는 Room 이름
-    - roomCode: 참가하고자 하는 Room 코드
-    - nickName: 참가자 닉네임
-    - password: Room 비밀번호 (is_private이 False인 경우 빈 문자열)
-    :return:
-    - isSuccess: Room 참가 가능 여부 (비밀번호를 잘못 입력하거나 존재하지 않는 방이라면 False)
-    - message: Room 참가 불가능한 이유 (isSuccess가 True인 경우 빈 문자열)
-    """
-    if request.method == 'POST':
+class JoinRoomAPI(APIView):
+    def post(self, request):
+        """
+        Room 참가 가능 여부 확인
+        
+        :param request:
+        - roomName: 참가하고자 하는 Room 이름
+        - roomCode: 참가하고자 하는 Room 코드
+        - nickName: 참가자 닉네임
+        - password: Room 비밀번호 (is_private이 False인 경우 빈 문자열)
+        
+        :return:
+        - isSuccess: Room 참가 가능 여부 (비밀번호를 잘못 입력하거나 존재하지 않는 방이라면 False)
+        - message: Room 참가 불가능한 이유 (isSuccess가 True인 경우 빈 문자열)
+        """
         request = json.loads(request.body)
         name = request.get('roomName')
         code = request.get('roomCode')
@@ -201,13 +194,3 @@ def room_join(request):
                     'isSuccess': True
                 },
                 status=status.HTTP_202_ACCEPTED)
-
-    # POST 요청이 아닌 경우
-    else:
-        return Response(
-            {
-                'message': '[Server] Invalid request.',
-                'roomCode': -1,
-                'isSuccess': False
-            },
-            status=status.HTTP_400_BAD_REQUEST)
