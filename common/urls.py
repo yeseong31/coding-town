@@ -1,6 +1,6 @@
 from django.urls import path
 
-from common.views import RegisterView, LoginView
+from common.views.accounts_views import RegisterView, LoginView
 
 app_name = 'common'
 
