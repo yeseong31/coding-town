@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from sockets.models import Room, Tag
-from sockets.serializers import RoomsSerializer, CreateRoomSerializer
+from sockets.serializers import RoomsSerializer, CreateRoomSerializer, JoinRoomSerializer
 
 
 class RoomsAPI(APIView):
@@ -153,6 +153,14 @@ class CreateRoomAPI(APIView):
 
 
 class JoinRoomAPI(APIView):
+    @swagger_auto_schema(
+        request_body=JoinRoomSerializer,
+        responses={
+            201: 'Created',
+            400: 'Bed Request',
+            500: 'Internal Server Error'
+        }
+    )
     def post(self, request):
         """
         Room 참가 가능 여부 확인

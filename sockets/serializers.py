@@ -38,3 +38,17 @@ class CreateRoomSerializer(serializers.ModelSerializer):
         fields = ('roomName', 'nickName', 'password', 'tags',)
         extra_kwargs = {'password': {'write_only': True}}
         depth = 1
+
+
+class JoinRoomSerializer(serializers.ModelSerializer):
+    roomName = serializers.CharField(max_length=50, source='name', help_text='Room 이름', required=True)
+    roomCode = serializers.IntegerField(source='code', help_text='Room 코드', required=True)
+    nickName = serializers.CharField(max_length=128, source='owner', help_text='Room 생성자 닉네임', required=True)
+    password = serializers.CharField(max_length=128, help_text='Room 비밀번호', required=False)
+    
+    class Meta:
+        model = Room
+        fields = ('roomName', 'roomCode', 'nickName', 'password',)
+        extra_kwargs = {'roomCode': {'write_only': True}, 'password': {'write_only': True}}
+        depth = 1
+    
