@@ -1,6 +1,7 @@
 import os
 
 import socketio
+import stun
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -305,6 +306,30 @@ def on_icecandidate(sid, data):
         sio.emit('icecandidate', response_data, room=code)
     else:
         sio.emit('icecandidate', response_data, to=target)
+
+
+@sio.on('stun')
+def on_stun(sid, data):
+    """
+    STUN Server 이벤트
+
+    :param sid:
+    - SocketIO ID
+    
+    :return(emit):
+    - natType: NAT 타입
+    - externalIp: 공용 IP 주소
+    - externalPort: 공용 Port 번호
+    """
+    nat_type, external_ip, external_port = stun.get_ip_info()
+    
+    response_data = {
+        'natType': nat_type,
+        'externalIp': external_ip,
+        'externalPort': external_port
+    }
+    
+    sio.emit('stun', response_data, to=sid)
 
 
 def test(request):
