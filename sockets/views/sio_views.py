@@ -39,33 +39,48 @@ def background_thread():
 
 
 @sio.event
-def connect(sid, environ):
+def on_connect(sid, environ):
     """
-    Socket Connect 이벤트 감지
+    SocketIO Connect 이벤트
+    
     :param sid:
-        - SocketIO ID
+    - SocketIO ID
+    
     :return(emit):
-        - message: emit 설명
-        - sid: SocketIO ID
+    - message: emit 설명
+    - sid: SocketIO ID
     """
     sio.emit('connect', {'message': '[Server] Connected', 'sid': sid})
 
 
 @sio.event
-def disconnect(sid):
+def on_disconnect(sid):
     """
-    Socket Disconnect 이벤트 감지
+    SocketIO Disconnect 이벤트
+    
     :param sid:
-        - SocketIO ID
+    - SocketIO ID
+    
     :return(emit):
-        - message: emit 설명
+    - message: emit 설명
     """
     sio.emit('disconnect', {'message': '[Server] Disconnected'})
 
 
 @sio.event
-def message(sid, msg):
-    """Socket 메시지 송수신 이벤트 감지"""
+def on_message(sid, msg):
+    """
+    Socket Message 이벤트
+    
+    :param sid:
+    - SocketIO ID
+    
+    :param msg:
+    - 메시지 내용
+    
+    :return(emit):
+    - msg: 메시지 내용
+    """
     if msg == 'New Connect!':
         to_client['message'] = 'welcome!'
         to_client['type'] = 'connect'
@@ -82,17 +97,20 @@ def message(sid, msg):
 
 
 @sio.on('create')
-def create(sid, data):
+def on_create(sid, data):
     """
     Room 입장에 필요한 정보를 확인한 뒤 입장 코드 반환
+    
     :param sid:
-        - SocketIO ID
+    - SocketIO ID
+    
     :param data:
-        - nickName: Room 생성자 닉네임
-        - roomCode: Room 코드
+    - nickName: Room 생성자 닉네임
+    - roomCode: Room 코드
+    
     :return(emit):
-        - message: emit 설명
-        - isSuccess: Room 생성 성공 여부
+    - message: emit 설명
+    - isSuccess: Room 생성 성공 여부
     """
     owner = data['nickName']
     code = data['roomCode']
@@ -107,18 +125,21 @@ def create(sid, data):
 
 
 @sio.on('join')
-def join(sid, data):
+def on_join(sid, data):
     """
     새로운 참여자의 Room 참여 정보를 기존 Room 참여자들에게 전달
+    
     :param sid:
-        - SocketIO ID
+    - SocketIO ID
+    
     :param data:
-        - nickName: Room 생성자 닉네임
-        - roomCode: Room 코드
+    - nickName: Room 생성자 닉네임
+    - roomCode: Room 코드
+    
     :return(emit):
-        - message: emit 설명
-        - nickName: 참여자 닉네임
-        - sid: SocketIO ID
+    - message: emit 설명
+    - nickName: 참여자 닉네임
+    - sid: SocketIO ID
     """
     nickname = data['nickName']
     code = data['roomCode']
@@ -133,17 +154,20 @@ def join(sid, data):
     
     
 @sio.on('handshake')
-def handshake(sid, data):
+def on_handshake(sid, data):
     """
     WebRTC의 offer, answer 이벤트 전에 실행되는 SocketIO Handshake
+    
     :param sid:
-        - SocketIO ID
+    - SocketIO ID
+    
     :param data:
-        - roomCode: Room 코드
-        - sid: SocketIO ID (새로운 참여자)
+    - roomCode: Room 코드
+    - sid: SocketIO ID (새로운 참여자)
+    
     :return(emit):
-        - message: emit 설명
-        - sid: SocketIO ID
+    - message: emit 설명
+    - sid: SocketIO ID
     """
     target = data['sid']
     code = data['roomCode']
@@ -160,20 +184,23 @@ def handshake(sid, data):
 
 
 @sio.on('offer')
-def offer(sid, data):
+def on_offer(sid, data):
     """
     기존 참여자들의 정보를 새로운 참여자에게 전달
+    
     :param sid:
-        - SocketIO ID
+    - SocketIO ID
+    
     :param data:
-        - roomCode: Room 코드
-        - sdp: 참여자 peer 정보
+    - roomCode: Room 코드
+    - sdp: 참여자 peer 정보
+    
     :return(emit):
-        - message: emit 설명
-        - roomCode: Room 코드
-        - sdp: 기존 참여자 peer 정보
-        - sid: SocketIO ID (새로운 참여자)
-        - isSuccess: 이벤트 수행 결과
+    - message: emit 설명
+    - roomCode: Room 코드
+    - sdp: 기존 참여자 peer 정보
+    - sid: SocketIO ID (새로운 참여자)
+    - isSuccess: 이벤트 수행 결과
     """
     code = data['roomCode']
     sdp = data['sdp']
@@ -191,20 +218,23 @@ def offer(sid, data):
 
 
 @sio.on('answer')
-def answer(sid, data):
+def on_answer(sid, data):
     """
     새로운 참여자의 정보를 서버로 전달
+    
     :param sid:
-        - SocketIO ID
+    - SocketIO ID
+    
     :param data:
-        - roomCode: Room 코드
-        - sdp: 참여자 peer 정보
-        - sid: SocketIO ID (새로운 참여자)
+    - roomCode: Room 코드
+    - sdp: 참여자 peer 정보
+    - sid: SocketIO ID (새로운 참여자)
+    
     :return(emit):
-        - message: emit 설명
-        - roomCode: Room 코드
-        - sdp: 참여자 peer 정보
-        - isSuccess: 이벤트 수행 결과
+    - message: emit 설명
+    - roomCode: Room 코드
+    - sdp: 참여자 peer 정보
+    - isSuccess: 이벤트 수행 결과
     """
     code = data['roomCode']
     sdp = data['sdp']
@@ -221,17 +251,20 @@ def answer(sid, data):
 
 
 @sio.on('bye')
-def bye(sid, data):
+def on_bye(sid, data):
     """
     Room 퇴장 이벤트
+    
     :param sid:
-        - SocketIO ID
+    - SocketIO ID
+    
     :param data:
-        - roomCode: 퇴장한 Room 코드
-        - nickName: 퇴장한 참여자 닉네임
-    :return:
-        - message: emit 설명
-        - isSuccess: 이벤트 수행 결과
+    - roomCode: 퇴장한 Room 코드
+    - nickName: 퇴장한 참여자 닉네임
+    
+    :return(emit):
+    - message: emit 설명
+    - isSuccess: 이벤트 수행 결과
     """
     code = data['roomCode']
     nickname = data['nickName']
@@ -245,17 +278,20 @@ def bye(sid, data):
 
 
 @sio.on('icecandidate')
-def icecandidate(sid, data):
+def on_icecandidate(sid, data):
     """
     IceCandidate 이벤트
+    
     :param sid:
-        - SocketIO ID
+    - SocketIO ID
+    
     :param data:
-        - sid: SocketIO ID(새로운 참여자)
-        - roomCode: Room 코드
-        - candidate: IceCandidate 객체
-    :return:
-        - candidate: IceCandidate 객체
+    - sid: SocketIO ID(새로운 참여자)
+    - roomCode: Room 코드
+    - candidate: IceCandidate 객체
+    
+    :return(emit):
+    - candidate: IceCandidate 객체
     """
     target = data['sid']
     code = data['roomCode']
