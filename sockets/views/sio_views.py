@@ -68,7 +68,7 @@ def on_disconnect(sid):
     sio.emit('disconnect', {'message': '[Server] Disconnected'})
 
 
-@sio.event
+@sio.on('message')
 def on_message(sid, msg):
     """
     Socket Message 이벤트
