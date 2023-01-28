@@ -10,7 +10,6 @@ DEBUG = False
 
 ALLOWED_HOSTS = [
     os.getenv('ELASTIC_IP'),
-    os.getenv('AMAZON_DOMAIN'),
     os.getenv('DNS_NAME')
 ]
 
